@@ -29,11 +29,6 @@ public class UserController {
         return userService.getOne(id);
     }
 
-    @PostMapping
-    public ResponseEntity<UserEntity> create(@RequestBody UserEntity user){
-        var newUser = userService.create(user);
-        return new ResponseEntity<>(newUser, HttpStatus.CREATED);
-    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable long id){
