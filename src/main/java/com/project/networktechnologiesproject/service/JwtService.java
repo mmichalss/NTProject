@@ -1,5 +1,7 @@
 package com.project.networktechnologiesproject.service;
 
+import com.project.networktechnologiesproject.commonTypes.UserRole;
+import com.project.networktechnologiesproject.infrastructure.entity.AuthEntity;
 import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -20,12 +22,28 @@ public class JwtService {
 
     @Value("${token.sign.key}")
     private String jwtSigningKey;
+    private long tokenLifetime = 1000 * 60 * 24;
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
     }
-    public String generateToken(UserEntity userEntity){
-        return generateToken(new HashMap<>(), userEntity);
+
+    public UserRole extractRole(String token){
+        String roleString = extractClaim(token, (claims) -> claims.get("role", String.class));
+        return UserRole.valueOf(roleString);
+    }
+    public String generateToken(AuthEntity userDetails){
+        return generateToken(new HashMap<>(), userDetails);
+    }
+    public String generateToken(Map<String, Object> extraClaims, AuthEntity userDetails){
+        extraClaims.put("role", userDetails.getRole());
+        return Jwts.builder()
+                .claims(extraClaims)
+                .subject(userDetails.getUsername())
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + tokenLifetime))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     public boolean isTokenValid(String token) {
@@ -40,16 +58,6 @@ public class JwtService {
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolvers) {
         final Claims claims = extractAllClaims(token);
         return claimsResolvers.apply(claims);
-    }
-
-    private String generateToken(Map<String, Object> extraClaims, UserEntity userEntity) {
-        return Jwts.builder()
-                .claims(extraClaims)
-                .subject(userEntity.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 24))
-                .signWith(getSigningKey())
-                .compact();
     }
 
     private boolean isTokenExpired(String token) {

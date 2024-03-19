@@ -1,6 +1,11 @@
 package com.project.networktechnologiesproject.controller;
 
+import com.project.networktechnologiesproject.controller.dto.LoginDto;
+import com.project.networktechnologiesproject.controller.dto.LoginResponseDto;
+import com.project.networktechnologiesproject.controller.dto.RegisterDto;
+import com.project.networktechnologiesproject.controller.dto.RegisterResponseDto;
 import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
+import com.project.networktechnologiesproject.service.AuthService;
 import com.project.networktechnologiesproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,21 +18,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
-    private final UserService userService;
-
+    private final AuthService authService;
     @Autowired
-    public AuthController(UserService userService){
-        this.userService = userService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
-    @PostMapping("/singIn")
-    public ResponseEntity<> signIn(){
-
+    @PostMapping("/register")
+    public ResponseEntity<RegisterResponseDto> register(@RequestBody RegisterDto requestBody){
+        RegisterResponseDto dto = authService.register(requestBody);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
-    @PostMapping("/signUp")
-    public ResponseEntity<UserEntity> signUp(@RequestBody UserEntity user){
-            var newUser = userService.create(user);
-            return new ResponseEntity<>(newUser, HttpStatus.CREATED);
+    @PostMapping("/login")
+    public ResponseEntity<LoginResponseDto> login(@RequestBody LoginDto registerBody){
+        LoginResponseDto dto = authService.login(registerBody);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 }

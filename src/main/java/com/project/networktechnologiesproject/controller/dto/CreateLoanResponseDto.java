@@ -1,31 +1,29 @@
-package com.project.networktechnologiesproject.infrastructure.entity;
+package com.project.networktechnologiesproject.controller.dto;
 
-import jakarta.persistence.*;
+import com.project.networktechnologiesproject.infrastructure.entity.BookEntity;
+import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
 
 import java.util.Date;
 
-@Entity
-@Table(name = "loans", schema = "library")
-public class LoanEntity {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Id
-    @Column(name = "id")
+public class CreateLoanResponseDto {
     private long id;
-    @ManyToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private UserEntity user;
-    @ManyToOne
-    @JoinColumn(name = "book_id", insertable = false, updatable = false)
     private BookEntity book;
-    @Basic
-    @Column(name = "loan_date")
     private Date loanDate;
-    @Basic
-    @Column(name = "due_date")
     private Date dueDate;
-    @Basic
-    @Column(name = "return_date")
     private Date return_date;
+
+    public CreateLoanResponseDto() {
+    }
+
+    public CreateLoanResponseDto(long id, UserEntity user, BookEntity book, Date loanDate, Date dueDate, Date return_date) {
+        this.id = id;
+        this.user = user;
+        this.book = book;
+        this.loanDate = loanDate;
+        this.dueDate = dueDate;
+        this.return_date = return_date;
+    }
 
     public long getId() {
         return id;
