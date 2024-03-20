@@ -5,10 +5,12 @@ import com.project.networktechnologiesproject.commonTypes.UserRole;
 public class RegisterResponseDto {
     private String username;
     private UserRole role;
+    private long user_id;
 
-    public RegisterResponseDto(String username, UserRole role) {
+    public RegisterResponseDto(String username, UserRole role, long userId) {
         this.username = username;
         this.role = role;
+        user_id = userId;
     }
 
     public String getUsername() {
@@ -25,5 +27,13 @@ public class RegisterResponseDto {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public long getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(long user_id) {
+        this.user_id = user_id;
     }
 }
