@@ -1,5 +1,8 @@
 package com.project.networktechnologiesproject.controller;
 
+import com.project.networktechnologiesproject.controller.dto.CreateLoanDto;
+import com.project.networktechnologiesproject.controller.dto.CreateLoanResponseDto;
+import com.project.networktechnologiesproject.controller.dto.GetLoanDto;
 import com.project.networktechnologiesproject.infrastructure.entity.LoanEntity;
 import com.project.networktechnologiesproject.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +23,17 @@ public class LoanController {
     }
 
     @GetMapping
-    List<LoanEntity> getAll(){
+    public List<GetLoanDto> getAll(){
         return loanService.getAll();
     }
 
     @GetMapping("/{id}")
-    public LoanEntity getOne(@PathVariable long id) {
+    public GetLoanDto getOne(@PathVariable long id) {
         return loanService.getOne(id);
     }
 
     @PostMapping
-    public ResponseEntity<LoanEntity> create(@RequestBody LoanEntity loan){
+    public ResponseEntity<CreateLoanResponseDto> create(@RequestBody CreateLoanDto loan){
         var newLoan = loanService.create(loan);
         return new ResponseEntity<>(newLoan, HttpStatus.CREATED);
     }

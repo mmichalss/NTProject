@@ -1,5 +1,6 @@
 package com.project.networktechnologiesproject.controller.dto;
 
+import com.project.networktechnologiesproject.infrastructure.entity.AuthEntity;
 import com.project.networktechnologiesproject.infrastructure.entity.LoanEntity;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
@@ -10,23 +11,19 @@ import java.util.Set;
 
 public class GetUserDto {
     private long id;
-    private String username;
-    private String password;
-    private String role;
     private String email;
     private String name;
+    private AuthEntity auth;
     private Set<LoanEntity> loans;
 
     public GetUserDto() {
     }
 
-    public GetUserDto(long id, String username, String password, String role, String email, String name, Set<LoanEntity> loans) {
+    public GetUserDto(long id, String email, String name, Set<LoanEntity> loans,  AuthEntity auth) {
         this.id = id;
-        this.username = username;
-        this.password = password;
-        this.role = role;
         this.email = email;
         this.name = name;
+        this.auth = auth;
         this.loans = loans;
     }
 
@@ -36,30 +33,6 @@ public class GetUserDto {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
     }
 
     public String getEmail() {
@@ -76,6 +49,14 @@ public class GetUserDto {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public AuthEntity getAuth() {
+        return auth;
+    }
+
+    public void setAuth(AuthEntity auth) {
+        this.auth = auth;
     }
 
     public Set<LoanEntity> getLoans() {

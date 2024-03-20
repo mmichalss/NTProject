@@ -24,6 +24,14 @@ public class UserEntity {
     @JoinColumn(name = "user_id")
     private Set<LoanEntity> loans;
 
+    public AuthEntity getAuth() {
+        return auth;
+    }
+
+    public void setAuth(AuthEntity auth) {
+        this.auth = auth;
+    }
+
     public long getId() {
         return id;
     }

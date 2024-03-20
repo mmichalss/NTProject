@@ -1,5 +1,6 @@
 package com.project.networktechnologiesproject.controller;
 
+import com.project.networktechnologiesproject.controller.dto.GetUserDto;
 import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
 import com.project.networktechnologiesproject.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +21,12 @@ public class UserController {
     }
 
     @GetMapping
-    List<UserEntity> getAll(){
+    List<GetUserDto> getAll(){
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
-    public UserEntity getOne(@PathVariable long id) {
+    public GetUserDto getOne(@PathVariable long id) {
         return userService.getOne(id);
     }
 
