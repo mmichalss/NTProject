@@ -56,7 +56,7 @@ public class AuthService {
         AuthEntity authEntity = authRepository.findByUsername(dto.getUsername()).orElseThrow(RuntimeException::new);
 
         if(!passwordEncoder.matches(dto.getPassword(), authEntity.getPassword())){
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Username or Password is not valid");
         }
 
         String token =  jwtService.generateToken(authEntity);

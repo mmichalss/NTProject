@@ -5,10 +5,12 @@ import com.project.networktechnologiesproject.infrastructure.entity.BookEntity;
 import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
 import com.project.networktechnologiesproject.infrastructure.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -33,7 +35,7 @@ public class UserService {
     }
     public GetUserDto getOne(long id){
         // this function is optional, so .orElseThrow() is needed.
-        var user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        var user = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User with following id was not found: " + id));
         return new GetUserDto(user.getId(), user.getEmail(), user.getName(), user.getLoans(), user.getAuth());
     }
     public CreateUserResponseDto create(CreateUserDto user){
@@ -59,11 +61,8 @@ public class UserService {
 
     public void delete(long id){
         if (!userRepository.existsById(id)){
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with following id was not found: " + id);
         }
         userRepository.deleteById(id);
-    }
-    public UserEntity getOneByUsername(String username){
-        return userRepository.findByUsername(username).orElseThrow();
     }
 }

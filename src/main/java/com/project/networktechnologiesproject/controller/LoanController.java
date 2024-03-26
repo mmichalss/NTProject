@@ -8,6 +8,7 @@ import com.project.networktechnologiesproject.service.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,17 +29,20 @@ public class LoanController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public GetLoanDto getOne(@PathVariable long id) {
         return loanService.getOne(id);
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<CreateLoanResponseDto> create(@RequestBody CreateLoanDto loan){
         var newLoan = loanService.create(loan);
         return new ResponseEntity<>(newLoan, HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable long id){
         loanService.delete(id);
         return ResponseEntity.noContent().build();

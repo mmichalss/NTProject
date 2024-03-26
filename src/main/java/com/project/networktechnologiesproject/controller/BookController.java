@@ -8,6 +8,7 @@ import com.project.networktechnologiesproject.service.BookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,11 +24,13 @@ public class BookController {
     }
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('READER')")
     public List<GetBookDto> getAllBooks(){
         return bookService.getAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('READER')")
     public GetBookDto getOne(@PathVariable long id){
         return bookService.getOne(id);
     }
