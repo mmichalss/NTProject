@@ -5,7 +5,9 @@ import com.project.networktechnologiesproject.infrastructure.entity.BookEntity;
 import com.project.networktechnologiesproject.infrastructure.entity.LoanEntity;
 import com.project.networktechnologiesproject.infrastructure.repository.LoanRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +25,7 @@ public class LoanService {
     }
     public GetLoanDto getOne(long id){
         // this function is optional, so .orElseThrow() is needed.
-        var loan = loanRepository.findById(id).orElseThrow(() -> new RuntimeException("Loan not found"));
+        var loan = loanRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan with following id was not found: " + id));
         return new GetLoanDto(loan.getId(), loan.getUser(), loan.getBook(), loan.getLoanDate(), loan.getDueDate(), loan.getReturn_date());
     }
     public CreateLoanResponseDto create(CreateLoanDto loan){
@@ -41,7 +43,7 @@ public class LoanService {
 
     public void delete(long id){
         if (!loanRepository.existsById(id)){
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Loan with following id was not found: " + id);
         }
         loanRepository.deleteById(id);
     }

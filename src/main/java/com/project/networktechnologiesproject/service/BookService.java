@@ -6,7 +6,9 @@ import com.project.networktechnologiesproject.controller.dto.GetBookDto;
 import com.project.networktechnologiesproject.infrastructure.entity.BookEntity;
 import com.project.networktechnologiesproject.infrastructure.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +28,7 @@ public class BookService {
     }
     public GetBookDto getOne(long id){
         // this function is optional, so .orElseThrow() is needed.
-        var book = bookRepository.findById(id).orElseThrow(() -> new RuntimeException("Book not found"));
+        var book = bookRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Book with id: " + id + "was not found."));
         return new GetBookDto(book.getId(), book.getIsbn(), book.getTitle(), book.getAuthor(), book.getPublisher(), book.getYearPublished(), book.getAvailableCopies() > 0);}
 
     public CreateBookResponseDto create(CreateBookDto book){
@@ -44,7 +46,7 @@ public class BookService {
 
     public void delete(long id){
         if (!bookRepository.existsById(id)){
-            throw new RuntimeException();
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "A book with following id doesn't exist:" + id);
         }
         bookRepository.deleteById(id);
     }
