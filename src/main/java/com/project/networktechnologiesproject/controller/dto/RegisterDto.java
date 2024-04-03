@@ -4,9 +4,14 @@ import com.project.networktechnologiesproject.commonTypes.UserRole;
 import org.apache.catalina.User;
 
 public class RegisterDto {
+    //@NotBlank(message = "Password is required")
     private String password;
+    //@NotBlank(message = "Username is required")
     private String username;
+    //@NotNull
     private UserRole role;
+    //@NotBlank(message = "Email is required")
+    //@Email
     private String email;
 
     public RegisterDto() {

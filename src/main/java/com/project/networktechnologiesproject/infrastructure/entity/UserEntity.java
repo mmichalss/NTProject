@@ -2,6 +2,7 @@ package com.project.networktechnologiesproject.infrastructure.entity;
 
 import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -17,20 +18,10 @@ public class UserEntity {
     @Basic
     @Column(name = "name")
     private String name;
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private AuthEntity auth;
 
-    @OneToMany
-    @JoinColumn(name = "user_id")
-    private Set<LoanEntity> loans;
+    @OneToMany(mappedBy = "user")
+    private List<LoanEntity> loans;
 
-    public AuthEntity getAuth() {
-        return auth;
-    }
-
-    public void setAuth(AuthEntity auth) {
-        this.auth = auth;
-    }
 
     public long getId() {
         return id;
@@ -56,11 +47,11 @@ public class UserEntity {
         this.name = name;
     }
 
-    public Set<LoanEntity> getLoans() {
+    public List<LoanEntity> getLoans() {
         return loans;
     }
 
-    public void setLoans(Set<LoanEntity> loans) {
+    public void setLoans(List<LoanEntity> loans) {
         this.loans = loans;
     }
 }
