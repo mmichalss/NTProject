@@ -7,6 +7,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 
+import java.util.List;
 import java.util.Set;
 
 public class GetUserDto {
@@ -14,12 +15,12 @@ public class GetUserDto {
     private String email;
     private String name;
     private AuthEntity auth;
-    private Set<LoanEntity> loans;
+    private List<LoanEntity> loans;
 
     public GetUserDto() {
     }
 
-    public GetUserDto(long id, String email, String name, Set<LoanEntity> loans,  AuthEntity auth) {
+    public GetUserDto(long id, String email, String name, List<LoanEntity> loans,  AuthEntity auth) {
         this.id = id;
         this.email = email;
         this.name = name;
@@ -59,11 +60,11 @@ public class GetUserDto {
         this.auth = auth;
     }
 
-    public Set<LoanEntity> getLoans() {
+    public List<LoanEntity> getLoans() {
         return loans;
     }
 
-    public void setLoans(Set<LoanEntity> loans) {
+    public void setLoans(List<LoanEntity> loans) {
         this.loans = loans;
     }
 }

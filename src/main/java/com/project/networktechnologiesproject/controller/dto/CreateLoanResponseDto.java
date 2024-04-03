@@ -7,22 +7,20 @@ import java.util.Date;
 
 public class CreateLoanResponseDto {
     private long id;
-    private UserEntity user;
-    private BookEntity book;
+    private long userId;
+    private long bookId;
     private Date loanDate;
     private Date dueDate;
-    private Date return_date;
 
     public CreateLoanResponseDto() {
     }
 
-    public CreateLoanResponseDto(long id, UserEntity user, BookEntity book, Date loanDate, Date dueDate, Date return_date) {
+    public CreateLoanResponseDto(long id, long userId, long bookId, Date loanDate, Date dueDate) {
         this.id = id;
-        this.user = user;
-        this.book = book;
+        this.userId = userId;
+        this.bookId = bookId;
         this.loanDate = loanDate;
         this.dueDate = dueDate;
-        this.return_date = return_date;
     }
 
     public long getId() {
@@ -33,20 +31,20 @@ public class CreateLoanResponseDto {
         this.id = id;
     }
 
-    public UserEntity getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
-    public BookEntity getBook() {
-        return book;
+    public long getBookId() {
+        return bookId;
     }
 
-    public void setBook(BookEntity book) {
-        this.book = book;
+    public void setBookId(long bookId) {
+        this.bookId = bookId;
     }
 
     public Date getLoanDate() {
@@ -63,13 +61,5 @@ public class CreateLoanResponseDto {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
-    }
-
-    public Date getReturn_date() {
-        return return_date;
-    }
-
-    public void setReturn_date(Date return_date) {
-        this.return_date = return_date;
     }
 }

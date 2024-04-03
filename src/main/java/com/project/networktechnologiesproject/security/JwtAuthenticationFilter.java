@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-            if (authHeader == null || !authHeader.startsWith("BEARER ")){
+            if (authHeader == null || !authHeader.startsWith("Bearer ")){
                 filterChain.doFilter(request, response);
             }
             // token is on index 7.
@@ -51,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 context.setAuthentication(token);
                 SecurityContextHolder.setContext(context);
-            }
+              }
 
             filterChain.doFilter(request, response);
 

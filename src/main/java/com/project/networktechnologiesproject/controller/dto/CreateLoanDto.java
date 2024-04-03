@@ -6,44 +6,31 @@ import com.project.networktechnologiesproject.infrastructure.entity.UserEntity;
 import java.util.Date;
 
 public class CreateLoanDto {
-    private UserEntity user;
-    private BookEntity book;
-    private Date loanDate;
+    private long userId;
+    private long bookId;
     private Date dueDate;
-    private Date return_date;
-
     public CreateLoanDto() {
     }
-    public CreateLoanDto(UserEntity user, BookEntity book, Date loanDate, Date dueDate, Date return_date) {
-        this.user = user;
-        this.book = book;
-        this.loanDate = loanDate;
+    public CreateLoanDto(long user, long book, Date loanDate, Date dueDate) {
+        this.userId = user;
+        this.bookId = book;
         this.dueDate = dueDate;
-        this.return_date = return_date;
     }
 
-    public UserEntity getUser() {
-        return user;
+    public long getUserId() {
+        return userId;
     }
 
-    public void setUser(UserEntity user) {
-        this.user = user;
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
-    public BookEntity getBook() {
-        return book;
+    public long getBookId() {
+        return bookId;
     }
 
-    public void setBook(BookEntity book) {
-        this.book = book;
-    }
-
-    public Date getLoanDate() {
-        return loanDate;
-    }
-
-    public void setLoanDate(Date loanDate) {
-        this.loanDate = loanDate;
+    public void setBookId(long bookId) {
+        this.bookId = bookId;
     }
 
     public Date getDueDate() {
@@ -54,11 +41,4 @@ public class CreateLoanDto {
         this.dueDate = dueDate;
     }
 
-    public Date getReturn_date() {
-        return return_date;
-    }
-
-    public void setReturn_date(Date return_date) {
-        this.return_date = return_date;
-    }
 }

@@ -11,17 +11,17 @@ public class LoanEntity {
     @Id
     @Column(name = "id")
     private long id;
-    @ManyToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", insertable = false, updatable = false, nullable = false)
     private UserEntity user;
     @ManyToOne
-    @JoinColumn(name = "book_id", insertable = false, updatable = false)
+    @JoinColumn(name = "book_id", insertable = false, updatable = false, nullable = false)
     private BookEntity book;
     @Basic
-    @Column(name = "loan_date")
+    @Column(name = "loan_date", nullable = false)
     private Date loanDate;
     @Basic
-    @Column(name = "due_date")
+    @Column(name = "due_date", nullable = false)
     private Date dueDate;
     @Basic
     @Column(name = "return_date")

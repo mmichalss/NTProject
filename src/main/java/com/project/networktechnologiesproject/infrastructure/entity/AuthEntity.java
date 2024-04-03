@@ -30,14 +30,6 @@ public class AuthEntity {
     public AuthEntity() {
     }
 
-    public AuthEntity(long id, String username, String password, UserRole role, UserEntity user) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.role = role;
-        this.user = user;
-    }
-
     public long getId() {
         return id;
     }

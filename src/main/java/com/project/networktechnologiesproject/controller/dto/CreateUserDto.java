@@ -3,18 +3,19 @@ package com.project.networktechnologiesproject.controller.dto;
 import com.project.networktechnologiesproject.infrastructure.entity.AuthEntity;
 import com.project.networktechnologiesproject.infrastructure.entity.LoanEntity;
 
+import java.util.List;
 import java.util.Set;
 
 public class CreateUserDto {
     private String email;
     private String name;
     private AuthEntity auth;
-    private Set<LoanEntity> loans;
+    private List<LoanEntity> loans;
 
     public CreateUserDto() {
     }
 
-    public CreateUserDto(String email, String name, AuthEntity auth, Set<LoanEntity> loans) {
+    public CreateUserDto(String email, String name, AuthEntity auth, List<LoanEntity> loans) {
         this.email = email;
         this.name = name;
         this.auth = auth;
@@ -45,11 +46,11 @@ public class CreateUserDto {
         this.auth = auth;
     }
 
-    public Set<LoanEntity> getLoans() {
+    public List<LoanEntity> getLoans() {
         return loans;
     }
 
-    public void setLoans(Set<LoanEntity> loans) {
+    public void setLoans(List<LoanEntity> loans) {
         this.loans = loans;
     }
 }

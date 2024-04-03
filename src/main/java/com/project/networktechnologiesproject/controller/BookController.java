@@ -15,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/books")
+@PreAuthorize("hasRole('ADMIN')")
 public class BookController {
     private final BookService bookService;
 
