@@ -1,8 +1,9 @@
 import './Book_list-form.css';
-import { books } from './Book_data';
+import useBooks from './Book_data';
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { GetBookDto } from '../api/dto/book/book.dto';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -23,40 +24,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button } from '@mui/material';
-
-// export default function BookList() {
-//   const listItems = books.map((book) => (
-//     <form id="bookForm" className="Book_list-form">
-//       <div>
-//         <img
-//           src="https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsb2ZmaWNlMV9jdXRlXzNkX2lsbHVzdHJhdGlvbl9vZl9hX3N0YWNrX29mX2Jvb2tzX2lzb2xhdF81MjhhNmU5Ni0zZjllLTRlOGQtYmEyNy1lZGU3OWU0NTg0YTAucG5n.png"
-//           alt={book.title}
-//           width={80}
-//         />
-//         <b>{book.title}</b>
-//         <p>{book.author}</p>
-//       </div>
-//     </form>
-//   ));
-//   return (
-//     <>
-//       <h1>Books</h1>
-//       <ul className=''>{listItems}</ul>
-//     </>
-//   );
-// }
-
-interface Data {
-  id: number;
-  isbn: number;
-  title: string;
-  author: string;
-  publisher: string;
-  year_published: number;
-  is_available: string;
-}
-
-const rows = books;
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -103,7 +70,7 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof Data;
+  id: keyof GetBookDto;
   label: string;
   numeric: boolean;
 }
@@ -134,13 +101,13 @@ const headCells: readonly HeadCell[] = [
     label: 'pubsliher',
   },
   {
-    id: 'year_published',
+    id: 'yearPublished',
     numeric: false,
     disablePadding: false,
     label: 'year_published',
   },
   {
-    id: 'is_available',
+    id: 'isAvailable',
     numeric: false,
     disablePadding: false,
     label: 'is_available',
@@ -151,7 +118,7 @@ interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof Data,
+    property: keyof GetBookDto,
   ) => void;
   order: Order;
   orderBy: string;
@@ -161,7 +128,7 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler =
-    (property: keyof Data) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof GetBookDto) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -268,159 +235,165 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 }
 function BookList() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof Data>('title');
+  const [orderBy, setOrderBy] = React.useState<keyof GetBookDto>('title');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const rows = useBooks();
 
-  const handleRequestSort = (
-    event: React.MouseEvent<unknown>,
-    property: keyof Data,
-  ) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
-    const selectedIndex = selected.indexOf(id);
-    let newSelected: readonly number[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, id);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1),
-      );
+  const visibleRows = React.useMemo(() => {
+    if (rows === undefined) {
+      return [];
     }
-    setSelected(newSelected);
-  };
+    return stableSort(rows, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage,
+    );
+  }, [order, orderBy, page, rowsPerPage, rows]);
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
+  if (rows === undefined) {
+    return <div>Loading...</div>;
+  } else {
+    const handleRequestSort = (
+      event: React.MouseEvent<unknown>,
+      property: keyof GetBookDto,
+    ) => {
+      const isAsc = orderBy === property && order === 'asc';
+      setOrder(isAsc ? 'desc' : 'asc');
+      setOrderBy(property);
+    };
 
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+      const selectedIndex = selected.indexOf(id);
+      let newSelected: readonly number[] = [];
 
-  const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setDense(event.target.checked);
-  };
+      if (selectedIndex === -1) {
+        newSelected = newSelected.concat(selected, id);
+      } else if (selectedIndex === 0) {
+        newSelected = newSelected.concat(selected.slice(1));
+      } else if (selectedIndex === selected.length - 1) {
+        newSelected = newSelected.concat(selected.slice(0, -1));
+      } else if (selectedIndex > 0) {
+        newSelected = newSelected.concat(
+          selected.slice(0, selectedIndex),
+          selected.slice(selectedIndex + 1),
+        );
+      }
+      setSelected(newSelected);
+    };
 
-  const isSelected = (id: number) => selected.indexOf(id) !== -1;
+    const handleChangePage = (event: unknown, newPage: number) => {
+      setPage(newPage);
+    };
 
-  // Avoid a layout jump when reaching the last page with empty rows.
-  const emptyRows =
-    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+    const handleChangeRowsPerPage = (
+      event: React.ChangeEvent<HTMLInputElement>,
+    ) => {
+      setRowsPerPage(parseInt(event.target.value, 10));
+      setPage(0);
+    };
 
-  const visibleRows = React.useMemo(
-    () =>
-      stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      ),
-    [order, orderBy, page, rowsPerPage],
-  );
+    const handleChangeDense = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setDense(event.target.checked);
+    };
 
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
-        <EnhancedTableToolbar
-          numSelected={selected.length}
-          selected={selected}
-        />
-        <TableContainer>
-          <Table
-            sx={{ minWidth: 750 }}
-            aria-labelledby="tableTitle"
-            size={dense ? 'small' : 'medium'}
-          >
-            <EnhancedTableHead
-              numSelected={selected.length}
-              order={order}
-              orderBy={orderBy}
-              onRequestSort={handleRequestSort}
-              rowCount={rows.length}
-            />
-            <TableBody>
-              {visibleRows.map((row, index) => {
-                const isItemSelected = isSelected(row.id);
-                const labelId = `enhanced-table-checkbox-${index}`;
+    const isSelected = (id: number) => selected.indexOf(id) !== -1;
 
-                return (
-                  <TableRow
-                    hover
-                    onClick={(event) => handleClick(event, row.id)}
-                    role="checkbox"
-                    aria-checked={isItemSelected}
-                    tabIndex={-1}
-                    key={row.id}
-                    selected={isItemSelected}
-                    sx={{ cursor: 'pointer' }}
-                  >
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isItemSelected}
-                        inputProps={{
-                          'aria-labelledby': labelId,
-                        }}
-                      />
-                    </TableCell>
-                    <TableCell
-                      component="th"
-                      id={labelId}
-                      scope="row"
-                      padding="none"
+    // Avoid a layout jump when reaching the last page with empty rows.
+    const emptyRows =
+      page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
+
+    return (
+      <Box sx={{ width: '100%' }}>
+        <Paper sx={{ width: '100%', mb: 2 }}>
+          <EnhancedTableToolbar
+            numSelected={selected.length}
+            selected={selected}
+          />
+          <TableContainer>
+            <Table
+              sx={{ minWidth: 750 }}
+              aria-labelledby="tableTitle"
+              size={dense ? 'small' : 'medium'}
+            >
+              <EnhancedTableHead
+                numSelected={selected.length}
+                order={order}
+                orderBy={orderBy}
+                onRequestSort={handleRequestSort}
+                rowCount={rows.length}
+              />
+              <TableBody>
+                {visibleRows.map((row, index) => {
+                  const isItemSelected = isSelected(row.id);
+                  const labelId = `enhanced-table-checkbox-${index}`;
+
+                  return (
+                    <TableRow
+                      hover
+                      onClick={(event) => handleClick(event, row.id)}
+                      role="checkbox"
+                      aria-checked={isItemSelected}
+                      tabIndex={-1}
+                      key={row.id}
+                      selected={isItemSelected}
+                      sx={{ cursor: 'pointer' }}
                     >
-                      {row.isbn}
-                    </TableCell>
-                    <TableCell align="left">{row.title}</TableCell>
-                    <TableCell align="left">{row.author}</TableCell>
-                    <TableCell align="left">{row.publisher}</TableCell>
-                    <TableCell align="left">{row.year_published}</TableCell>
-                    <TableCell align="left">{row.is_available}</TableCell>
+                      <TableCell padding="checkbox">
+                        <Checkbox
+                          color="primary"
+                          checked={isItemSelected}
+                          inputProps={{
+                            'aria-labelledby': labelId,
+                          }}
+                        />
+                      </TableCell>
+                      <TableCell
+                        component="th"
+                        id={labelId}
+                        scope="row"
+                        padding="none"
+                      >
+                        {row.isbn}
+                      </TableCell>
+                      <TableCell align="left">{row.title}</TableCell>
+                      <TableCell align="left">{row.author}</TableCell>
+                      <TableCell align="left">{row.publisher}</TableCell>
+                      <TableCell align="left">{row.yearPublished}</TableCell>
+                      <TableCell align="left">{row.isAvailable}</TableCell>
+                    </TableRow>
+                  );
+                })}
+                {emptyRows > 0 && (
+                  <TableRow
+                    style={{
+                      height: (dense ? 33 : 53) * emptyRows,
+                    }}
+                  >
+                    <TableCell colSpan={6} />
                   </TableRow>
-                );
-              })}
-              {emptyRows > 0 && (
-                <TableRow
-                  style={{
-                    height: (dense ? 33 : 53) * emptyRows,
-                  }}
-                >
-                  <TableCell colSpan={6} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </TableContainer>
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={rows.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={rows.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+          />
+        </Paper>
+        <FormControlLabel
+          control={<Switch checked={dense} onChange={handleChangeDense} />}
+          label="Dense padding"
         />
-      </Paper>
-      <FormControlLabel
-        control={<Switch checked={dense} onChange={handleChangeDense} />}
-        label="Dense padding"
-      />
-    </Box>
-  );
+      </Box>
+    );
+  }
 }
 
-export default BookList
+export default BookList;

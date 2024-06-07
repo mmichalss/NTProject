@@ -14,9 +14,12 @@ import AdbIcon from '@mui/icons-material/Adb';
 import { AccountCircle } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
-const pages = ['Books', 'Loans'];
-const links = ['books', 'loans'];
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+const pages = ['Books', 'Users'];
+const links = ['books', 'users'];
+const settings_global = ['Profile', 'Loans', 'Login'];
+const settings_links_global = ['profile', 'loans', 'login'];
+const settings_logged = ['Profile', 'Loans', 'Logout'];
+const settings_links_logged = ['profile', 'loans', 'logout'];
 
 function MenuAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -117,7 +120,7 @@ function MenuAppBar() {
               textDecoration: 'none',
             }}
           >
-            ss
+            what's that?
           </Typography>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page, index) => (
@@ -134,7 +137,7 @@ function MenuAppBar() {
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>
-            <Tooltip title="Open settings">
+            <Tooltip title="Account settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <AccountCircle />
               </IconButton>
@@ -155,8 +158,13 @@ function MenuAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              {settings_global.map((setting, index) => (
+                <MenuItem
+                  key={setting}
+                  onClick={handleCloseUserMenu}
+                  component={Link}
+                  to={settings_links_global[index]}
+                >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>
               ))}

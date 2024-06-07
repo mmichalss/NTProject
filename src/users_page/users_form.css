@@ -1,0 +1,38 @@
+.usersList ul {
+  list-style-type: none;
+}
+
+.usersList {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+
+.usersList li {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.usersList li div {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.usersList li div h5 {
+  display: inline-block;
+  margin: 0;
+  padding: 5px;
+  border: 1px solid #ccc;
+}

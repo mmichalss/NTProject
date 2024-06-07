@@ -5,6 +5,8 @@ import { Formik } from 'formik';
 import { useCallback, useMemo } from 'react';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import axios, { AxiosInstance } from 'axios';
+import { useApi } from '../api/ApiProvider';
 
 type FormValues = {
   username: string;
@@ -15,14 +17,19 @@ function LoginForm() {
   const initialValues = { username: '', password: '' };
 
   const navigate = useNavigate();
+  const apiClient = useApi();
 
   const submit = useCallback(
     (values: FormValues, formik: any) => {
-      console.log(values);
-      navigate('/home');
-      formik.resetForm();
+      apiClient.login(values).then((response) => {
+        if (response.success) {
+          navigate('/home');
+        } else {
+          formik.setFieldError('password', 'Invalid username or password');
+        }
+      });
     },
-    [navigate],
+    [apiClient, navigate],
   );
 
   const validationSchema = useMemo(
