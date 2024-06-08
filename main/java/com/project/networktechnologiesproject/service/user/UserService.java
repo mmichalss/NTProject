@@ -26,12 +26,12 @@ public class UserService extends OwnershipService {
     }
     public List<GetUserDto> getAll(){
         var users = userRepository.findAll();
-        return users.stream().map((user) -> new GetUserDto(user.getId(), user.getEmail(), user.getName())).collect(Collectors.toList());
+        return users.stream().map((user) -> new GetUserDto(user.getId(), user.getEmail(), user.getName(), user.getLastName())).collect(Collectors.toList());
     }
     public GetUserDto getOne(long id){
         // this function is optional, so .orElseThrow() is needed.
         var user = userRepository.findById(id).orElseThrow(() -> UserWithIdNotFoundException.create(id));
-        return new GetUserDto(user.getId(), user.getEmail(), user.getName());
+        return new GetUserDto(user.getId(), user.getEmail(), user.getName(), user.getLastName());
     }
     public CreateUserResponseDto create(CreateUserDto user){
         // After creating UserDto I should encrypt the password attribute.
@@ -57,7 +57,7 @@ public class UserService extends OwnershipService {
         AuthEntity auth = authRepository.findByUsername(username).orElseThrow(() -> UserWithUsernameNotFoundException.create(username));
         UserEntity user = auth.getUser();
 
-        return new GetUserDto(user.getId(), user.getEmail(), user.getName());
+        return new GetUserDto(user.getId(), user.getEmail(), user.getName(), user.getLastName());
     }
 
     @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #id)")

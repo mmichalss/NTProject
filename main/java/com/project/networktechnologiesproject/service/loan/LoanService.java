@@ -64,7 +64,7 @@ public class LoanService extends OwnershipService
         return mapLoan(loan);
     }
     private GetLoanResponseDto mapLoan(LoanEntity loan){
-        GetUserDto user = new GetUserDto(loan.getUser().getId(), loan.getUser().getEmail(), loan.getUser().getName());
+        GetUserDto user = new GetUserDto(loan.getUser().getId(), loan.getUser().getEmail(), loan.getUser().getName(), loan.getUser().getLastName());
         GetBookDto book = new GetBookDto(loan.getBook().getId(), loan.getBook().getIsbn(), loan.getBook().getTitle(), loan.getBook().getAuthor(), loan.getBook().getPublisher(), loan.getBook().getYearPublished(), loan.getBook().getAvailableCopies() > 0);
         return new GetLoanResponseDto(loan.getId(), user, book, loan.getLoanDate(), loan.getDueDate());
     }
