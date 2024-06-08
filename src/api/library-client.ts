@@ -6,7 +6,11 @@ import {
   GetLoanPagesDto,
   GetWholeLoanDto,
 } from './dto/loan/loan.dto';
-import { GetUserDto } from './dto/user/user.dto';
+import {
+  GetUserDto,
+  UpdateUserDto,
+  UpdateUserResponseDto,
+} from './dto/user/user.dto';
 import { RegisterDto, RegisterResponseDto } from './dto/register/register.dto';
 
 export type ClientResponse<T> = {
@@ -114,7 +118,7 @@ export class LibraryClient {
         `loans`,
         {
           params: {
-            userId: id,
+            id: id,
           },
         },
       );
@@ -163,6 +167,29 @@ export class LibraryClient {
     try {
       const response: AxiosResponse<RegisterResponseDto> =
         await this.client.post('auth/register', data);
+
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+
+  public async updateUser(
+    id: number,
+    data: UpdateUserDto,
+  ): Promise<ClientResponse<UpdateUserResponseDto | undefined>> {
+    try {
+      const response: AxiosResponse<UpdateUserResponseDto> =
+        await this.client.patch(`users/${id}`, data);
 
       return {
         success: true,

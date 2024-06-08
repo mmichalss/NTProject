@@ -1,14 +1,14 @@
 export class RegisterDto {
-  username: string = '';
   password: string = '';
-  role: Role = 'user';
+  username: string = '';
+  role: Role = 'ROLE_READER';
   email: string = '';
 }
 
-export type Role = 'admin' | 'user';
+export type Role = 'ROLE_ADMIN' | 'ROLE_READER';
 
 export class RegisterResponseDto {
   username: string = '';
-  role: Role = 'user';
+  role: Role = 'ROLE_READER';
   email: string = '';
 }
