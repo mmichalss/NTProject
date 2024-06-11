@@ -7,7 +7,7 @@ function HomePage() {
     <Box sx={{ flexGrow: 1 }}>
       <MenuAppBar />
       <Box>
-        <h1>This is HOME PAGE</h1>
+        <h1>HOME PAGE</h1>
       </Box>
       <Outlet />
     </Box>

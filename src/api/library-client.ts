@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { LoginRequestDto } from './dto/login/login-request.dto';
-import { GetBookDto } from './dto/book/book.dto';
+import { GetBookDto, GetBookMappedDto } from './dto/book/book.dto';
 import {
+  CreateLoanDto,
+  CreateLoanResponseDto,
   GetLoanDto,
   GetLoanPagesDto,
   GetWholeLoanDto,
@@ -12,12 +14,17 @@ import {
   UpdateUserResponseDto,
 } from './dto/user/user.dto';
 import { RegisterDto, RegisterResponseDto } from './dto/register/register.dto';
+import { JwtPayload, jwtDecode } from 'jwt-decode';
 
 export type ClientResponse<T> = {
   success: boolean;
   data: T;
   status: number;
 };
+
+interface RoleJwtPayload extends JwtPayload {
+  role?: string;
+}
 
 export class LibraryClient {
   private baseUrl = 'http://localhost:8080/api';
@@ -66,6 +73,23 @@ export class LibraryClient {
     }
   }
 
+  public getUserRole(): string {
+    const token = this.client.defaults.headers.common[
+      'Authorization'
+    ] as string;
+    if (token) {
+      const decoded = jwtDecode<RoleJwtPayload>(token);
+      if (decoded.role) {
+        return decoded.role;
+      }
+    }
+    return '';
+  }
+
+  public logout(): void {
+    this.client.defaults.headers.common['Authorization'] = '';
+  }
+
   public async getMe(): Promise<ClientResponse<GetUserDto | undefined>> {
     try {
       const response: AxiosResponse<GetUserDto> =
@@ -87,7 +111,7 @@ export class LibraryClient {
   }
 
   public async getAllBooks(): Promise<
-    ClientResponse<GetBookDto[] | undefined>
+    ClientResponse<GetBookMappedDto[] | undefined>
   > {
     try {
       const response: AxiosResponse<GetBookDto[]> =
@@ -95,7 +119,18 @@ export class LibraryClient {
 
       return {
         success: true,
-        data: response.data,
+        data: response.data.map(
+          ({ id, isbn, title, author, publisher, yearPublished, available }) =>
+            new GetBookMappedDto(
+              id,
+              isbn,
+              title,
+              author,
+              publisher,
+              yearPublished,
+              available.toString(),
+            ),
+        ),
         status: response.status,
       };
     } catch (error) {
@@ -191,6 +226,26 @@ export class LibraryClient {
       const response: AxiosResponse<UpdateUserResponseDto> =
         await this.client.patch(`users/${id}`, data);
 
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+  public async createLoan(
+    data: CreateLoanDto,
+  ): Promise<ClientResponse<CreateLoanResponseDto | undefined>> {
+    try {
+      const response: AxiosResponse<CreateLoanResponseDto> =
+        await this.client.post('loans', data);
       return {
         success: true,
         data: response.data,

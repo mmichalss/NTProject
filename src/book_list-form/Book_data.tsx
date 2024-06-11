@@ -1,16 +1,16 @@
 import { useCallback } from 'react';
 import { useApi } from '../api/ApiProvider';
-import { GetBookDto } from '../api/dto/book/book.dto';
+import { GetBookDto, GetBookMappedDto } from '../api/dto/book/book.dto';
 import { ClientResponse } from '../api/library-client';
 import React from 'react';
 
 export default function useBooks() {
   const apiClient = useApi();
-  const [books, setBooks] = React.useState<GetBookDto[] | undefined>();
+  const [books, setBooks] = React.useState<GetBookMappedDto[] | undefined>();
 
   const fetchBooks = useCallback(async () => {
     try {
-      const response: ClientResponse<GetBookDto[] | undefined> =
+      const response: ClientResponse<GetBookMappedDto[] | undefined> =
         await apiClient.getAllBooks();
       if (response.success) {
         setBooks(response.data);

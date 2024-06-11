@@ -24,6 +24,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button } from '@mui/material';
+import { useApi } from '../api/ApiProvider';
+import { LibraryClient } from '../api/library-client';
+import { CreateLoanDto } from '../api/dto/loan/loan.dto';
+import { GetUserDto } from '../api/dto/user/user.dto';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -107,7 +111,7 @@ const headCells: readonly HeadCell[] = [
     label: 'year_published',
   },
   {
-    id: 'isAvailable',
+    id: 'available',
     numeric: false,
     disablePadding: false,
     label: 'is_available',
@@ -167,17 +171,24 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selected: readonly number[];
+  apiClient: LibraryClient;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const { numSelected } = props;
   const { selected } = props;
+  const { apiClient } = props;
 
   const handleBorrowSelected = (
     event: React.MouseEvent<unknown>,
     selected: readonly number[],
   ) => {
-    console.log(selected);
+    selected.forEach((id) => {
+      await apiClient.getAllBooks();
+      const data = new CreateLoanDto();
+
+      apiClient.createLoan();
+    });
   };
 
   return (
@@ -242,18 +253,21 @@ function BookList() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const rows = useBooks();
 
+  const apiClient = useApi();
+
   const visibleRows = React.useMemo(() => {
     if (rows === undefined) {
       return [];
+    } else {
+      return stableSort(rows, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage,
+      );
     }
-    return stableSort(rows, getComparator(order, orderBy)).slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage,
-    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   if (rows === undefined) {
-    return <div>Loading...</div>;
+    return <div>No books available</div>;
   } else {
     const handleRequestSort = (
       event: React.MouseEvent<unknown>,
@@ -310,6 +324,7 @@ function BookList() {
           <EnhancedTableToolbar
             numSelected={selected.length}
             selected={selected}
+            apiClient={apiClient}
           />
           <TableContainer>
             <Table
@@ -341,13 +356,15 @@ function BookList() {
                       sx={{ cursor: 'pointer' }}
                     >
                       <TableCell padding="checkbox">
-                        <Checkbox
-                          color="primary"
-                          checked={isItemSelected}
-                          inputProps={{
-                            'aria-labelledby': labelId,
-                          }}
-                        />
+                        {row.available === 'true' ? (
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': labelId,
+                            }}
+                          />
+                        ) : null}
                       </TableCell>
                       <TableCell
                         component="th"
@@ -361,7 +378,7 @@ function BookList() {
                       <TableCell align="left">{row.author}</TableCell>
                       <TableCell align="left">{row.publisher}</TableCell>
                       <TableCell align="left">{row.yearPublished}</TableCell>
-                      <TableCell align="left">{row.isAvailable}</TableCell>
+                      <TableCell align="left">{row.available}</TableCell>
                     </TableRow>
                   );
                 })}

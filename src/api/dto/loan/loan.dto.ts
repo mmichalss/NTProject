@@ -36,3 +36,23 @@ export class GetLoanDto {
     this.dueDate = dueDate;
   }
 }
+
+export class CreateLoanDto {
+  userId: number | undefined;
+  loanId: number | undefined;
+  dueDate: Date | undefined;
+
+  constructor(userId: number, loanId: number, dueDate: Date) {
+    this.userId = userId;
+    this.loanId = loanId;
+    this.dueDate = dueDate;
+  }
+}
+
+export class CreateLoanResponseDto {
+  id: number | undefined;
+  userId: number | undefined;
+  loanId: number | undefined;
+  loanDate: number | undefined;
+  dueDate: number | undefined;
+}
