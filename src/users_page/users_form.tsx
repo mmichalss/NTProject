@@ -37,7 +37,7 @@ export default function UsersForm() {
               <TableCell align="right">email</TableCell>
               <TableCell align="right">name</TableCell>
               <TableCell align="right">last_name</TableCell>
-              <TableCell align="right">change</TableCell>
+              <TableCell align="right"> </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

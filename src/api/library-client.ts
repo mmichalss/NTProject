@@ -29,12 +29,21 @@ interface RoleJwtPayload extends JwtPayload {
 export class LibraryClient {
   private baseUrl = 'http://localhost:8080/api';
   private client: AxiosInstance;
+  private token: string | null = null;
 
   constructor() {
     this.client = axios.create({
       baseURL: this.baseUrl,
     });
+
+    this.client.interceptors.request.use((config) => {
+      if (this.token) {
+        config.headers['Authorization'] = `Bearer ${this.token}`;
+      }
+      return config;
+    });
   }
+
   public async login(
     data: LoginRequestDto,
   ): Promise<ClientResponse<undefined | Error>> {
@@ -44,18 +53,9 @@ export class LibraryClient {
         data,
       );
 
-      this.client.interceptors.response.use(
-        (config) => {
-          config.headers['Authorization'] = `Bearer ${response.data.token}`;
-          return config;
-        },
-        (error) => {
-          return Promise.reject(error);
-        },
-      );
-      //saving a token
+      this.token = response.data.token;
       this.client.defaults.headers.common['Authorization'] =
-        `Bearer ${response.data.token}`;
+        `Bearer ${this.token}`;
 
       return {
         success: true,
@@ -87,7 +87,8 @@ export class LibraryClient {
   }
 
   public logout(): void {
-    this.client.defaults.headers.common['Authorization'] = '';
+    this.token = null;
+    delete this.client.defaults.headers.common['Authorization'];
   }
 
   public async getMe(): Promise<ClientResponse<GetUserDto | undefined>> {
@@ -101,7 +102,6 @@ export class LibraryClient {
       };
     } catch (error) {
       const axiosError = error as AxiosError<Error>;
-
       return {
         success: false,
         data: undefined,
@@ -111,30 +111,22 @@ export class LibraryClient {
   }
 
   public async getAllBooks(): Promise<
-    ClientResponse<GetBookMappedDto[] | undefined>
+    ClientResponse<GetBookDto[] | undefined>
   > {
     try {
       const response: AxiosResponse<GetBookDto[]> =
         await this.client.get('books');
 
+      console.log(response.data);
+
       return {
         success: true,
-        data: response.data.map(
-          ({ id, isbn, title, author, publisher, yearPublished, available }) =>
-            new GetBookMappedDto(
-              id,
-              isbn,
-              title,
-              author,
-              publisher,
-              yearPublished,
-              available.toString(),
-            ),
-        ),
+        data: response.data,
         status: response.status,
       };
     } catch (error) {
       const axiosError = error as AxiosError<Error>;
+      console.log(error);
 
       return {
         success: false,
@@ -145,18 +137,25 @@ export class LibraryClient {
   }
 
   public async getAllLoans(): Promise<
-    ClientResponse<GetLoanPagesDto[] | undefined>
+    ClientResponse<GetLoanPagesDto | undefined>
   > {
     try {
-      const id: number = (await this.getMe()).data!!.id;
-      const response: AxiosResponse<GetLoanPagesDto[]> = await this.client.get(
+      const meResponse = await this.getMe();
+      if (!meResponse.success || !meResponse.data) {
+        throw new Error('Unable to retrieve user information');
+      }
+
+      const id: number = meResponse.data.id;
+      const response: AxiosResponse<GetLoanPagesDto> = await this.client.get(
         `loans`,
         {
           params: {
-            id: id,
+            userId: id,
           },
         },
       );
+
+      console.log(response.data);
       return {
         success: true,
         data: response.data,

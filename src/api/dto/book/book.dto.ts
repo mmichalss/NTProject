@@ -24,7 +24,7 @@ export class GetBookMappedDto {
     author: string,
     publisher: string,
     yearPublished: number,
-    available: string,
+    available: boolean,
   ) {
     this.id = id;
     this.isbn = isbn;
@@ -32,10 +32,6 @@ export class GetBookMappedDto {
     this.author = author;
     this.publisher = publisher;
     this.yearPublished = yearPublished;
-    if (available === 'True') {
-      this.available = 'yes';
-    } else {
-      this.available = 'no';
-    }
+    this.available = available.toString();
   }
 }

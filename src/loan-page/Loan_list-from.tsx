@@ -1,9 +1,7 @@
-import './Book_list-form.css';
-import useBooks from './Book_data';
+import useLoans from '../loan-page/Loan_data';
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
-import { GetBookDto } from '../api/dto/book/book.dto';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -15,6 +13,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import { GetLoanDto } from '../api/dto/loan/loan.dto';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -24,10 +23,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { Button } from '@mui/material';
-import { useApi } from '../api/ApiProvider';
-import { LibraryClient } from '../api/library-client';
-import { CreateLoanDto } from '../api/dto/loan/loan.dto';
-import { GetUserDto } from '../api/dto/user/user.dto';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -74,47 +69,35 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof GetBookDto;
+  id: keyof GetLoanDto;
   label: string;
   numeric: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: 'isbn',
+    id: 'bookTitle',
     numeric: false,
     disablePadding: true,
-    label: 'isbn',
-  },
-  {
-    id: 'title',
-    numeric: false,
-    disablePadding: false,
     label: 'title',
   },
   {
-    id: 'author',
+    id: 'bookAuthor',
     numeric: false,
     disablePadding: false,
     label: 'author',
   },
   {
-    id: 'publisher',
+    id: 'loanDate',
     numeric: false,
     disablePadding: false,
-    label: 'pubsliher',
+    label: 'loan_date',
   },
   {
-    id: 'yearPublished',
+    id: 'dueDate',
     numeric: false,
     disablePadding: false,
-    label: 'year_published',
-  },
-  {
-    id: 'available',
-    numeric: false,
-    disablePadding: false,
-    label: 'is_available',
+    label: 'dueDate',
   },
 ];
 
@@ -122,7 +105,7 @@ interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof GetBookDto,
+    property: keyof GetLoanDto,
   ) => void;
   order: Order;
   orderBy: string;
@@ -132,16 +115,14 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler =
-    (property: keyof GetBookDto) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof GetLoanDto) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" padding="normal">
-          Borrow
-        </TableCell>
+        <TableCell align="left" padding="normal"></TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -171,24 +152,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selected: readonly number[];
-  apiClient: LibraryClient;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const { numSelected } = props;
   const { selected } = props;
-  const { apiClient } = props;
 
   const handleBorrowSelected = (
     event: React.MouseEvent<unknown>,
     selected: readonly number[],
   ) => {
-    selected.forEach((id) => {
-      await apiClient.getAllBooks();
-      const data = new CreateLoanDto();
-
-      apiClient.createLoan();
-    });
+    console.log(selected);
   };
 
   return (
@@ -221,7 +195,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           id="tableTitle"
           component="div"
         >
-          Books
+          Loans
         </Typography>
       )}
       {numSelected > 0 ? (
@@ -244,34 +218,32 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     </Toolbar>
   );
 }
-function BookList() {
+function LoanList() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof GetBookDto>('title');
+  const [orderBy, setOrderBy] = React.useState<keyof GetLoanDto>('bookTitle');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const rows = useBooks();
 
-  const apiClient = useApi();
+  const rows = useLoans();
 
   const visibleRows = React.useMemo(() => {
     if (rows === undefined) {
       return [];
-    } else {
-      return stableSort(rows, getComparator(order, orderBy)).slice(
-        page * rowsPerPage,
-        page * rowsPerPage + rowsPerPage,
-      );
     }
+    return stableSort(rows, getComparator(order, orderBy)).slice(
+      page * rowsPerPage,
+      page * rowsPerPage + rowsPerPage,
+    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   if (rows === undefined) {
-    return <div>No books available</div>;
+    return <div>You have no loans...</div>;
   } else {
     const handleRequestSort = (
       event: React.MouseEvent<unknown>,
-      property: keyof GetBookDto,
+      property: keyof GetLoanDto,
     ) => {
       const isAsc = orderBy === property && order === 'asc';
       setOrder(isAsc ? 'desc' : 'asc');
@@ -324,7 +296,6 @@ function BookList() {
           <EnhancedTableToolbar
             numSelected={selected.length}
             selected={selected}
-            apiClient={apiClient}
           />
           <TableContainer>
             <Table
@@ -347,38 +318,24 @@ function BookList() {
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.id)}
-                      role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.id}
+                      key={row.bookTitle}
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell padding="checkbox">
-                        {row.available === 'true' ? (
-                          <Checkbox
-                            color="primary"
-                            checked={isItemSelected}
-                            inputProps={{
-                              'aria-labelledby': labelId,
-                            }}
-                          />
-                        ) : null}
-                      </TableCell>
+                      <TableCell></TableCell>
                       <TableCell
                         component="th"
                         id={labelId}
                         scope="row"
                         padding="none"
                       >
-                        {row.isbn}
+                        {row.bookTitle}
                       </TableCell>
-                      <TableCell align="left">{row.title}</TableCell>
-                      <TableCell align="left">{row.author}</TableCell>
-                      <TableCell align="left">{row.publisher}</TableCell>
-                      <TableCell align="left">{row.yearPublished}</TableCell>
-                      <TableCell align="left">{row.available}</TableCell>
+                      <TableCell align="left">{row.bookAuthor}</TableCell>
+                      <TableCell align="left">{row.loanDate}</TableCell>
+                      <TableCell align="left">{row.dueDate}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -413,4 +370,4 @@ function BookList() {
   }
 }
 
-export default BookList;
+export default LoanList;

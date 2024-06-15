@@ -1,4 +1,4 @@
-import LoanList from '../loan-list-form/Loan_list-from';
+import LoanList from './Loan_list-from';
 
 function LoanPage() {
   return <LoanList />;

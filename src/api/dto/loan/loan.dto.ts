@@ -5,14 +5,15 @@ export class GetLoanPagesDto {
   loans: GetWholeLoanDto[] = [];
   currentPage: number = 1;
   totalItems: number = 0;
+  totalPages: number = 0;
   hasMore: boolean = false;
 }
 export class GetWholeLoanDto {
   id: number = 0;
   user: GetUserDto = new GetUserDto();
   book: GetBookDto = new GetBookDto();
-  loanDate: string = '';
-  dueDate: string = '';
+  loanDate: Date = new Date();
+  dueDate: Date = new Date();
 }
 
 export class GetLoanDto {
@@ -39,20 +40,14 @@ export class GetLoanDto {
 
 export class CreateLoanDto {
   userId: number | undefined;
-  loanId: number | undefined;
-  dueDate: Date | undefined;
-
-  constructor(userId: number, loanId: number, dueDate: Date) {
-    this.userId = userId;
-    this.loanId = loanId;
-    this.dueDate = dueDate;
-  }
+  bookId: number | undefined;
+  dueDate: string | undefined;
 }
 
 export class CreateLoanResponseDto {
   id: number | undefined;
   userId: number | undefined;
-  loanId: number | undefined;
+  bookId: number | undefined;
   loanDate: number | undefined;
   dueDate: number | undefined;
 }

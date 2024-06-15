@@ -1,7 +1,9 @@
-import useLoans from './Loan_data';
+import './Book_list-form.css';
+import useBooks from './Book_data';
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
+import { GetBookDto } from '../../api/dto/book/book.dto';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -13,16 +15,16 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
-import { GetLoanDto } from '../api/dto/loan/loan.dto';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
-import { Button } from '@mui/material';
+import { useApi } from '../../api/ApiProvider';
+import CreateLoan from './Create_loan';
+import useGetMe from '../../users_page/getMe';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -69,41 +71,47 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof GetLoanDto;
+  id: keyof GetBookDto;
   label: string;
   numeric: boolean;
 }
 
 const headCells: readonly HeadCell[] = [
   {
-    id: 'id',
+    id: 'isbn',
     numeric: false,
     disablePadding: true,
-    label: 'loan_id',
+    label: 'isbn',
   },
   {
-    id: 'bookTitle',
+    id: 'title',
     numeric: false,
-    disablePadding: true,
+    disablePadding: false,
     label: 'title',
   },
   {
-    id: 'bookAuthor',
+    id: 'author',
     numeric: false,
     disablePadding: false,
     label: 'author',
   },
   {
-    id: 'loanDate',
+    id: 'publisher',
     numeric: false,
     disablePadding: false,
-    label: 'loan_date',
+    label: 'pubsliher',
   },
   {
-    id: 'dueDate',
+    id: 'yearPublished',
     numeric: false,
     disablePadding: false,
-    label: 'dueDate',
+    label: 'year_published',
+  },
+  {
+    id: 'available',
+    numeric: false,
+    disablePadding: false,
+    label: 'is_available',
   },
 ];
 
@@ -111,7 +119,7 @@ interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof GetLoanDto,
+    property: keyof GetBookDto,
   ) => void;
   order: Order;
   orderBy: string;
@@ -121,14 +129,16 @@ interface EnhancedTableProps {
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
   const createSortHandler =
-    (property: keyof GetLoanDto) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof GetBookDto) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" padding="normal"></TableCell>
+        <TableCell align="left" padding="normal">
+          Borrow
+        </TableCell>
         {headCells.map((headCell) => (
           <TableCell
             key={headCell.id}
@@ -158,19 +168,13 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
   numSelected: number;
   selected: readonly number[];
+  userId: number | undefined;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
   const { numSelected } = props;
   const { selected } = props;
-
-  const handleBorrowSelected = (
-    event: React.MouseEvent<unknown>,
-    selected: readonly number[],
-  ) => {
-    console.log(selected);
-  };
-
+  const { userId } = props;
   return (
     <Toolbar
       sx={{
@@ -201,18 +205,12 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           id="tableTitle"
           component="div"
         >
-          Loans
+          Books
         </Typography>
       )}
       {numSelected > 0 ? (
         <Tooltip title="Borrow">
-          <Button
-            variant="outlined"
-            type="submit"
-            onClick={(event) => handleBorrowSelected(event, selected)}
-          >
-            Borrow Selected
-          </Button>
+          <CreateLoan selected={selected} userId={userId} />
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
@@ -224,53 +222,65 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
     </Toolbar>
   );
 }
-function LoanList() {
+function BookList() {
   const [order, setOrder] = React.useState<Order>('asc');
-  const [orderBy, setOrderBy] = React.useState<keyof GetLoanDto>('bookTitle');
+  const [orderBy, setOrderBy] = React.useState<keyof GetBookDto>('title');
   const [selected, setSelected] = React.useState<readonly number[]>([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-  const rows = useLoans();
+  const apiClient = useApi();
+
+  const rows = useBooks();
+  const userRole = apiClient.getUserRole();
+
+  const userId = useGetMe()?.id;
 
   const visibleRows = React.useMemo(() => {
     if (rows === undefined) {
       return [];
+    } else {
+      return stableSort(rows, getComparator(order, orderBy)).slice(
+        page * rowsPerPage,
+        page * rowsPerPage + rowsPerPage,
+      );
     }
-    return stableSort(rows, getComparator(order, orderBy)).slice(
-      page * rowsPerPage,
-      page * rowsPerPage + rowsPerPage,
-    );
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   if (rows === undefined) {
-    return <div>You have no loans...</div>;
+    return <div>No books available</div>;
   } else {
     const handleRequestSort = (
       event: React.MouseEvent<unknown>,
-      property: keyof GetLoanDto,
+      property: keyof GetBookDto,
     ) => {
       const isAsc = orderBy === property && order === 'asc';
       setOrder(isAsc ? 'desc' : 'asc');
       setOrderBy(property);
     };
 
-    const handleClick = (event: React.MouseEvent<unknown>, id: number) => {
+    const handleClick = (
+      event: React.MouseEvent<unknown>,
+      id: number,
+      available: string,
+    ) => {
       const selectedIndex = selected.indexOf(id);
       let newSelected: readonly number[] = [];
 
-      if (selectedIndex === -1) {
-        newSelected = newSelected.concat(selected, id);
-      } else if (selectedIndex === 0) {
-        newSelected = newSelected.concat(selected.slice(1));
-      } else if (selectedIndex === selected.length - 1) {
-        newSelected = newSelected.concat(selected.slice(0, -1));
-      } else if (selectedIndex > 0) {
-        newSelected = newSelected.concat(
-          selected.slice(0, selectedIndex),
-          selected.slice(selectedIndex + 1),
-        );
+      if (available === 'true') {
+        if (selectedIndex === -1) {
+          newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+          newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+          newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+          newSelected = newSelected.concat(
+            selected.slice(0, selectedIndex),
+            selected.slice(selectedIndex + 1),
+          );
+        }
       }
       setSelected(newSelected);
     };
@@ -299,10 +309,13 @@ function LoanList() {
     return (
       <Box sx={{ width: '100%' }}>
         <Paper sx={{ width: '100%', mb: 2 }}>
-          <EnhancedTableToolbar
-            numSelected={selected.length}
-            selected={selected}
-          />
+          {(userRole === 'ROLE_ADMIN' || userRole === 'ROLE_READER') && (
+            <EnhancedTableToolbar
+              numSelected={selected.length}
+              selected={selected}
+              userId={userId}
+            />
+          )}
           <TableContainer>
             <Table
               sx={{ minWidth: 750 }}
@@ -323,26 +336,41 @@ function LoanList() {
 
                   return (
                     <TableRow
-                      hover
+                      hover={row.available === 'true'}
+                      onClick={(event) =>
+                        handleClick(event, row.id, row.available)
+                      }
+                      role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       key={row.id}
                       selected={isItemSelected}
                       sx={{ cursor: 'pointer' }}
                     >
-                      <TableCell></TableCell>
+                      <TableCell padding="checkbox">
+                        {row.available === 'true' ? (
+                          <Checkbox
+                            color="primary"
+                            checked={isItemSelected}
+                            inputProps={{
+                              'aria-labelledby': labelId,
+                            }}
+                          />
+                        ) : null}
+                      </TableCell>
                       <TableCell
                         component="th"
                         id={labelId}
                         scope="row"
                         padding="none"
                       >
-                        {row.id}
+                        {row.isbn}
                       </TableCell>
-                      <TableCell align="left">{row.bookTitle}</TableCell>
-                      <TableCell align="left">{row.bookAuthor}</TableCell>
-                      <TableCell align="left">{row.loanDate}</TableCell>
-                      <TableCell align="left">{row.dueDate}</TableCell>
+                      <TableCell align="left">{row.title}</TableCell>
+                      <TableCell align="left">{row.author}</TableCell>
+                      <TableCell align="left">{row.publisher}</TableCell>
+                      <TableCell align="left">{row.yearPublished}</TableCell>
+                      <TableCell align="left">{row.available}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -377,4 +405,4 @@ function LoanList() {
   }
 }
 
-export default LoanList;
+export default BookList;

@@ -8,13 +8,15 @@ import LoanPage from './loan-page/Loan-page';
 import ApiProvider from './api/ApiProvider';
 import UsersPage from './users_page/users_page';
 import LogoutPage from './login-form/Logout-page';
+import GlobalHomePage from './home-page/Global-home-page';
 
 function App() {
   return (
     <BrowserRouter>
       <ApiProvider>
         <Routes>
-          <Route path="/home" element={<HomePage />}>
+          <Route path="/home" element={<GlobalHomePage />}>
+            <Route path="" element={<HomePage />} />
             <Route path="books" element={<BookPage />} />
             <Route path="loans" element={<LoanPage />} />
             <Route path="users" element={<UsersPage />} />
