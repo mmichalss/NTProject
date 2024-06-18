@@ -1,8 +1,12 @@
 import { useCallback } from 'react';
 import { useApi } from '../api/ApiProvider';
-import { ClientResponse } from '../api/library-client';
 import React from 'react';
-import { GetLoanDto, GetLoanPagesDto } from '../api/dto/loan/loan.dto';
+import {
+  GetLoanDto,
+  GetLoanPagesDto,
+  GetWholeLoanDto,
+} from '../api/dto/loan/loan.dto';
+import { ClientResponse } from '../api/library-client';
 
 export default function useLoans() {
   const apiClient = useApi();
@@ -10,24 +14,22 @@ export default function useLoans() {
 
   const fetchLoans = useCallback(async () => {
     try {
-      const response: ClientResponse<GetLoanPagesDto[] | undefined> =
+      const response: ClientResponse<GetLoanPagesDto | undefined> =
         await apiClient.getAllLoans();
       if (response.success) {
-        const result: GetLoanDto[] = [];
-        for (const loans of response.data || []) {
-          for (const loan of loans.loans) {
-            result.push(
+        const loans: GetWholeLoanDto[] = response.data!!.loans;
+        setLoans(
+          loans.map(
+            ({ id, book, loanDate, dueDate }) =>
               new GetLoanDto(
-                loan.id,
-                loan.book.title,
-                loan.book.author,
-                loan.loanDate,
-                loan.dueDate,
+                id,
+                book.title,
+                book.author,
+                new Date(loanDate).toISOString().split('T')[0],
+                new Date(dueDate).toISOString().split('T')[0],
               ),
-            );
-          }
-        }
-        setLoans(result);
+          ),
+        );
       } else {
         console.log(response.status);
       }

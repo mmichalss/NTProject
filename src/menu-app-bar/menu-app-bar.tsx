@@ -13,13 +13,16 @@ import MenuItem from '@mui/material/MenuItem';
 import AdbIcon from '@mui/icons-material/Adb';
 import { AccountCircle } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
+import { useApi } from '../api/ApiProvider';
 
-const pages = ['Books', 'Users'];
-const links = ['books', 'users'];
-const settings_global = ['Profile', 'Loans', 'Login'];
-const settings_links_global = ['profile', 'loans', 'login'];
+const pages = ['Books'];
+const links = ['books'];
+const settings_global = ['Login'];
+const settings_links_global = ['login'];
 const settings_logged = ['Profile', 'Loans', 'Logout'];
 const settings_links_logged = ['profile', 'loans', 'logout'];
+const settings_logged_admin = ['Profile', 'Loans', 'Users', 'Logout'];
+const settings_links_logged_admin = ['profile', 'loans', 'users', 'logout'];
 
 function MenuAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -43,6 +46,18 @@ function MenuAppBar() {
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
+
+  const apiClient = useApi();
+  let settings = settings_global;
+  let settings_links = settings_links_global;
+  if (apiClient.getUserRole() === 'ROLE_READER') {
+    settings = settings_logged;
+    settings_links = settings_links_logged;
+  }
+  if (apiClient.getUserRole() === 'ROLE_ADMIN') {
+    settings = settings_logged_admin;
+    settings_links = settings_links_logged_admin;
+  }
 
   return (
     <AppBar position="static">
@@ -158,12 +173,12 @@ function MenuAppBar() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings_global.map((setting, index) => (
+              {settings.map((setting, index) => (
                 <MenuItem
                   key={setting}
                   onClick={handleCloseUserMenu}
                   component={Link}
-                  to={settings_links_global[index]}
+                  to={settings_links[index]}
                 >
                   <Typography textAlign="center">{setting}</Typography>
                 </MenuItem>

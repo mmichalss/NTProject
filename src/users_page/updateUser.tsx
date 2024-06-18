@@ -1,14 +1,10 @@
-import * as React from 'react';
-import Popover from '@mui/material/Popover';
-import Typography from '@mui/material/Typography';
-import Button from '@mui/material/Button';
-import { TextField } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Button, Popover, TextField, Typography } from '@mui/material';
+import React from 'react';
+import { UpdateUserDto } from '../api/dto/user/user.dto';
 import { useApi } from '../api/ApiProvider';
-import { RegisterDto } from '../api/dto/register/register.dto';
 import { Formik } from 'formik';
 
-export default function AddNewUser() {
+export default function UpdateUser({ userId }: { userId: number }) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
@@ -16,14 +12,14 @@ export default function AddNewUser() {
   const apiClient = useApi();
 
   const submit = React.useCallback(
-    (values: RegisterDto, formik: any) => {
-      apiClient.register(values).then((response) => {
+    (values: UpdateUserDto, formik: any) => {
+      apiClient.updateUser(userId, values).then((response) => {
         if (response.success) {
         } else {
         }
       });
     },
-    [apiClient],
+    [apiClient, userId],
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,15 +34,11 @@ export default function AddNewUser() {
   const id = open ? 'simple-popover' : undefined;
 
   return (
-    <Formik onSubmit={submit} initialValues={new RegisterDto()}>
+    <Formik onSubmit={submit} initialValues={new UpdateUserDto()}>
       {(formik: any) => (
         <div>
-          <Button
-            aria-describedby={id}
-            variant="contained"
-            onClick={handleClick}
-          >
-            Add new User
+          <Button aria-describedby={id} onClick={handleClick}>
+            update
           </Button>
           <Popover
             id={id}
@@ -61,21 +53,14 @@ export default function AddNewUser() {
             <Typography sx={{ p: 2 }}>
               <form onSubmit={formik.handleSubmit}>
                 <TextField
-                  id="username"
-                  label="Username"
+                  id="name"
+                  label="Name"
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
                 <TextField
-                  id="password"
-                  label="Password"
-                  type="password"
-                  variant="outlined"
-                  onChange={formik.handleChange}
-                />
-                <TextField
-                  id="role"
-                  label="Role"
+                  id="lastName"
+                  label="Last Name"
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
@@ -86,7 +71,7 @@ export default function AddNewUser() {
                   onChange={formik.handleChange}
                 />
                 <Button type="submit" variant="contained">
-                  ADD
+                  CHANGE
                 </Button>
               </form>
             </Typography>
