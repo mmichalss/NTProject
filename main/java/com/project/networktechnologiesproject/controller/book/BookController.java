@@ -25,8 +25,7 @@ public class BookController {
 
     @GetMapping
     @PreAuthorize("permitAll()")
-    public List<GetBookDto> getAllBooks(){
-        return bookService.getAll();
+    public List<GetBookDto> getAllBooks(){return bookService.getAll();
     }
 
     @GetMapping("/{id}")
