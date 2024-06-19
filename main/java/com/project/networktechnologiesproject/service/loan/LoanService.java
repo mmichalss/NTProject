@@ -1,10 +1,7 @@
 package com.project.networktechnologiesproject.service.loan;
 
 import com.project.networktechnologiesproject.controller.book.dto.GetBookDto;
-import com.project.networktechnologiesproject.controller.loan.dto.CreateLoanDto;
-import com.project.networktechnologiesproject.controller.loan.dto.CreateLoanResponseDto;
-import com.project.networktechnologiesproject.controller.loan.dto.GetLoanResponseDto;
-import com.project.networktechnologiesproject.controller.loan.dto.GetLoansPageResponseDto;
+import com.project.networktechnologiesproject.controller.loan.dto.*;
 import com.project.networktechnologiesproject.controller.user.dto.GetUserDto;
 import com.project.networktechnologiesproject.infrastructure.book.BookEntity;
 import com.project.networktechnologiesproject.infrastructure.loan.LoanEntity;
@@ -16,6 +13,7 @@ import com.project.networktechnologiesproject.infrastructure.user.UserRepository
 import com.project.networktechnologiesproject.service.auth.OwnershipService;
 import com.project.networktechnologiesproject.service.book.error.BookWithIdNotFoundException;
 import com.project.networktechnologiesproject.service.loan.error.LoanWithIdNotFoundException;
+import com.project.networktechnologiesproject.service.loan.error.NoAvailableCopiesOfBookException;
 import com.project.networktechnologiesproject.service.user.error.UserWithIdNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class LoanService extends OwnershipService
@@ -58,6 +57,24 @@ public class LoanService extends OwnershipService
         return new GetLoansPageResponseDto(loansDto, loansPage.getNumber(), loansPage.getTotalElements(), loansPage.getTotalPages(), loansPage.hasNext());
     }
 
+    @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #userId)")
+    public GetLoansReturnedPageResponseDto getAllReturned(Long userId, int page, int size) {
+
+        Page<LoanEntity> loansPage;
+
+        Pageable pageable = PageRequest.of(page, size);
+
+        if(userId == null){
+            loansPage = loanRepository.findByReturnDateIsNotNull(pageable);
+        } else {
+            loansPage = loanRepository.findByUserIdAndReturnDateIsNotNull(userId, pageable);
+        }
+        List<GetLoanReturnedResponseDto> loansDto = loansPage.getContent().stream().map(this::mapLoanReturned).toList();
+
+        return new GetLoansReturnedPageResponseDto(loansDto, loansPage.getNumber(), loansPage.getTotalElements(), loansPage.getTotalPages(), loansPage.hasNext());
+
+    }
+
     @PostAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, returnObject.user.id)")
     public GetLoanResponseDto getOneById(long id){
         LoanEntity loan = loanRepository.findById(id).orElseThrow(() -> LoanWithIdNotFoundException.create(id));
@@ -69,6 +86,12 @@ public class LoanService extends OwnershipService
         return new GetLoanResponseDto(loan.getId(), user, book, loan.getLoanDate(), loan.getDueDate());
     }
 
+    private GetLoanReturnedResponseDto mapLoanReturned(LoanEntity loan){
+        GetUserDto user = new GetUserDto(loan.getUser().getId(), loan.getUser().getEmail(), loan.getUser().getName(), loan.getUser().getLastName());
+        GetBookDto book = new GetBookDto(loan.getBook().getId(), loan.getBook().getIsbn(), loan.getBook().getTitle(), loan.getBook().getAuthor(), loan.getBook().getPublisher(), loan.getBook().getYearPublished(), loan.getBook().getAvailableCopies() > 0);
+        return new GetLoanReturnedResponseDto(loan.getId(), user, book, loan.getLoanDate(), loan.getDueDate(), loan.getReturnDate());
+    }
+
     @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #loan.userId)")
     public CreateLoanResponseDto create(CreateLoanDto loan){
         UserEntity user = userRepository.findById(loan.getUserId()).orElseThrow(()-> UserWithIdNotFoundException.create(loan.getUserId()));
@@ -76,11 +99,16 @@ public class LoanService extends OwnershipService
 
 
         var loanEntity = new LoanEntity();
-        loanEntity.setUser(user);
-        loanEntity.setBook(book);
-        loanEntity.setLoanDate(new Date(System.currentTimeMillis()));
-        loanEntity.setDueDate(loan.getDueDate());
-        loanRepository.save(loanEntity);
+        if (book.getAvailableCopies() > 0) {
+            book.setAvailableCopies(book.getAvailableCopies() - 1);
+            loanEntity.setUser(user);
+            loanEntity.setBook(book);
+            loanEntity.setLoanDate(new Date(System.currentTimeMillis()));
+            loanEntity.setDueDate(loan.getDueDate());
+            loanRepository.save(loanEntity);
+        } else {
+            throw(NoAvailableCopiesOfBookException.create(book.getId()));
+        }
 
         return new CreateLoanResponseDto(loanEntity.getId(), loanEntity.getUser().getId(), loanEntity.getBook().getId(), loanEntity.getLoanDate(), loanEntity.getDueDate());
 
@@ -91,5 +119,15 @@ public class LoanService extends OwnershipService
             throw LoanWithIdNotFoundException.create(id);
         }
         loanRepository.deleteById(id);
+    }
+
+    public CreateLoanReturnedDto returnBook(long loanId) {
+        LoanEntity loan = loanRepository.findById(loanId).orElseThrow(() -> LoanWithIdNotFoundException.create(loanId));
+        loan.setReturnDate(new Date(System.currentTimeMillis()));
+        loan.getBook().setAvailableCopies(loan.getBook().getAvailableCopies() + 1);
+
+        loanRepository.save(loan);
+
+        return new CreateLoanReturnedDto(loan.getId(), loan.getUser().getId(), loan.getBook().getId(), loan.getLoanDate(), loan.getDueDate(), loan.getReturnDate());
     }
 }

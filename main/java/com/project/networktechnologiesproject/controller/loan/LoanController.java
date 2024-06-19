@@ -1,9 +1,6 @@
 package com.project.networktechnologiesproject.controller.loan;
 
-import com.project.networktechnologiesproject.controller.loan.dto.CreateLoanDto;
-import com.project.networktechnologiesproject.controller.loan.dto.CreateLoanResponseDto;
-import com.project.networktechnologiesproject.controller.loan.dto.GetLoanResponseDto;
-import com.project.networktechnologiesproject.controller.loan.dto.GetLoansPageResponseDto;
+import com.project.networktechnologiesproject.controller.loan.dto.*;
 import com.project.networktechnologiesproject.service.loan.LoanService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,6 +26,12 @@ public class LoanController {
         return new ResponseEntity<>(dto, HttpStatus.OK);
     }
 
+    @GetMapping("/returned")
+    public ResponseEntity<GetLoansReturnedPageResponseDto> getAllReturned(@RequestParam(required = false) Long userId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        GetLoansReturnedPageResponseDto dto = loanService.getAllReturned(userId, page, size);
+        return new ResponseEntity<>(dto, HttpStatus.OK);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GetLoanResponseDto> getOneById(@PathVariable long id) {
         GetLoanResponseDto dto = loanService.getOneById(id);
@@ -39,6 +42,12 @@ public class LoanController {
     public ResponseEntity<CreateLoanResponseDto> create(@RequestBody @Validated CreateLoanDto loan){
         var newLoan = loanService.create(loan);
         return new ResponseEntity<>(newLoan, HttpStatus.CREATED);
+    }
+
+   @PatchMapping("/{id}")
+    public ResponseEntity<CreateLoanReturnedDto> returnBook(@PathVariable long id){
+        CreateLoanReturnedDto loan = loanService.returnBook(id);
+        return new ResponseEntity<>(loan, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
