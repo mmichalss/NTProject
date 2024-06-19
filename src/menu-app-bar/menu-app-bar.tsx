@@ -10,19 +10,11 @@ import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
-import AdbIcon from '@mui/icons-material/Adb';
 import { AccountCircle } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 import { useApi } from '../api/ApiProvider';
-
-const pages = ['Books'];
-const links = ['books'];
-const settings_global = ['Login'];
-const settings_links_global = ['login'];
-const settings_logged = ['Profile', 'Loans', 'Logout'];
-const settings_links_logged = ['profile', 'loans', 'logout'];
-const settings_logged_admin = ['Profile', 'Loans', 'Users', 'Logout'];
-const settings_links_logged_admin = ['profile', 'loans', 'users', 'logout'];
+import { useTranslation } from 'react-i18next';
+import i18n from '../i18n';
 
 function MenuAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -47,9 +39,46 @@ function MenuAppBar() {
     setAnchorElUser(null);
   };
 
+  const handleChangeLanguageOnClick = () => {
+    if (i18n.language === 'en') {
+      i18n.changeLanguage('pl');
+    } else {
+      i18n.changeLanguage('en');
+    }
+  };
+
   const apiClient = useApi();
+  const { t } = useTranslation();
+
+  const pages = [t('books')];
+  const links = ['books'];
+  const settings_global = [t('login')];
+  const settings_links_global = ['login'];
+  const settings_logged = [
+    t('profile'),
+    t('loans'),
+    t('historyOfLoans'),
+    t('logout'),
+  ];
+  const settings_links_logged = ['profile', 'loans', 'loans_history', 'logout'];
+  const settings_logged_admin = [
+    t('profile'),
+    t('loans'),
+    t('userPage.title'),
+    t('bookPage.title'),
+    t('logout'),
+  ];
+  const settings_links_logged_admin = [
+    'profile',
+    'loans',
+    'users',
+    'books/admin',
+    'logout',
+  ];
+
   let settings = settings_global;
   let settings_links = settings_links_global;
+
   if (apiClient.getUserRole() === 'ROLE_READER') {
     settings = settings_logged;
     settings_links = settings_links_logged;
@@ -63,7 +92,6 @@ function MenuAppBar() {
     <AppBar position="static">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <AdbIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
           <Typography
             variant="h6"
             noWrap
@@ -79,7 +107,7 @@ function MenuAppBar() {
               textDecoration: 'none',
             }}
           >
-            HOME
+            {t('library')}
           </Typography>
 
           <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
@@ -118,7 +146,6 @@ function MenuAppBar() {
               ))}
             </Menu>
           </Box>
-          <AdbIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
           <Typography
             variant="h5"
             noWrap
@@ -149,6 +176,15 @@ function MenuAppBar() {
                 {page}
               </Button>
             ))}
+          </Box>
+
+          <Box sx={{ flexGrow: 0.03, display: { xs: 'none', md: 'flex' } }}>
+            <Button
+              sx={{ my: 2, color: 'white', display: 'block' }}
+              onClick={handleChangeLanguageOnClick}
+            >
+              {t('language')}
+            </Button>
           </Box>
 
           <Box sx={{ flexGrow: 0 }}>

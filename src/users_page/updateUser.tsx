@@ -3,23 +3,31 @@ import React from 'react';
 import { UpdateUserDto } from '../api/dto/user/user.dto';
 import { useApi } from '../api/ApiProvider';
 import { Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
-export default function UpdateUser({ userId }: { userId: number }) {
+interface UpdateUserProps {
+  userId: number;
+  onUpdate: () => void; // Callback to update the user list
+}
+
+export default function UpdateUser({ userId, onUpdate }: UpdateUserProps) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
 
   const apiClient = useApi();
+  const { t } = useTranslation();
 
   const submit = React.useCallback(
     (values: UpdateUserDto, formik: any) => {
       apiClient.updateUser(userId, values).then((response) => {
         if (response.success) {
+          onUpdate();
         } else {
         }
       });
     },
-    [apiClient, userId],
+    [apiClient, userId, onUpdate],
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,7 +46,7 @@ export default function UpdateUser({ userId }: { userId: number }) {
       {(formik: any) => (
         <div>
           <Button aria-describedby={id} onClick={handleClick}>
-            update
+            {t('update')}
           </Button>
           <Popover
             id={id}
@@ -71,7 +79,7 @@ export default function UpdateUser({ userId }: { userId: number }) {
                   onChange={formik.handleChange}
                 />
                 <Button type="submit" variant="contained">
-                  CHANGE
+                  {t('update')}
                 </Button>
               </form>
             </Typography>

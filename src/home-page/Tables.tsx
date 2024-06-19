@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Box } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 
 function createData(title: string, author: string, available: string) {
   return { title, author, available };
@@ -19,9 +20,13 @@ const rows = [
   createData('Emma', 'Jane Austen', 'true'),
 ];
 
-const columnNames = ['Title', 'Author', 'Available'];
-
 function ColumnNames() {
+  const { t } = useTranslation();
+  const columnNames = [
+    t('bookPage.label.title'),
+    t('bookPage.label.author'),
+    t('bookPage.label.available'),
+  ];
   return (
     <>
       {columnNames.map((columnName) => (
@@ -62,6 +67,7 @@ function RecomendationTable() {
 }
 
 export default function Tables() {
+  const { t } = useTranslation();
   return (
     <Box
       width={'100%'}
@@ -71,9 +77,9 @@ export default function Tables() {
       justifyContent="center"
       alignItems="center"
     >
-      <h2>our recomendations</h2>
+      <h2>{t('recomendations')}</h2>
       <RecomendationTable />
-      <h2>most read books</h2>
+      <h2>{t('mostReadBooks')}</h2>
       <RecomendationTable />
     </Box>
   );

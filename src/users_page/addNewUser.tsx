@@ -7,23 +7,26 @@ import { useNavigate } from 'react-router-dom';
 import { useApi } from '../api/ApiProvider';
 import { RegisterDto } from '../api/dto/register/register.dto';
 import { Formik } from 'formik';
+import { useTranslation } from 'react-i18next';
 
-export default function AddNewUser() {
+export default function AddNewUser({ onUpdate }: { onUpdate: () => void }) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
 
   const apiClient = useApi();
+  const { t } = useTranslation();
 
   const submit = React.useCallback(
     (values: RegisterDto, formik: any) => {
       apiClient.register(values).then((response) => {
         if (response.success) {
+          onUpdate();
         } else {
         }
       });
     },
-    [apiClient],
+    [apiClient, onUpdate],
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +49,7 @@ export default function AddNewUser() {
             variant="contained"
             onClick={handleClick}
           >
-            Add new User
+            {t('userPage.addNew')}
           </Button>
           <Popover
             id={id}
@@ -86,7 +89,7 @@ export default function AddNewUser() {
                   onChange={formik.handleChange}
                 />
                 <Button type="submit" variant="contained">
-                  ADD
+                  {t('userPage.addNew')}
                 </Button>
               </form>
             </Typography>

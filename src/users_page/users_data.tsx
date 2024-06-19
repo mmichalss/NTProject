@@ -19,9 +19,10 @@ export default function useUsersData() {
       console.error(error);
     }
   }, [apiClient]);
+
   React.useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  return users;
+  return { users, fetchUsers };
 }

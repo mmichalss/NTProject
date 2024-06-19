@@ -51,3 +51,45 @@ export class CreateLoanResponseDto {
   loanDate: number | undefined;
   dueDate: number | undefined;
 }
+
+export class GetLoanReturnedDto {
+  id: number = 0;
+  bookTitle: string = '';
+  bookAuthor: string = '';
+  loanDate: string = '';
+  dueDate: string = '';
+  returnDate: string = '';
+
+  constructor(
+    id: number,
+    bookTitle: string,
+    bookAuthor: string,
+    loanDate: string,
+    dueDate: string,
+    returnDate: string,
+  ) {
+    this.id = id;
+    this.bookTitle = bookTitle;
+    this.bookAuthor = bookAuthor;
+    this.loanDate = loanDate;
+    this.dueDate = dueDate;
+    this.returnDate = returnDate;
+  }
+}
+
+export class GetLoanReturnedWholeDto {
+  id: number = 0;
+  user: GetUserDto = new GetUserDto();
+  book: GetBookDto = new GetBookDto();
+  loanDate: Date = new Date();
+  dueDate: Date = new Date();
+  returnDate: Date = new Date();
+}
+
+export class GetLoansReturnedPagesDto {
+  loans: GetLoanReturnedWholeDto[] = [];
+  currentPage: number = 1;
+  totalItems: number = 0;
+  totalPages: number = 0;
+  hasMore: boolean = false;
+}
