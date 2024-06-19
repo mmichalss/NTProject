@@ -42,7 +42,7 @@ public class LoanService extends OwnershipService
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
     }
-    @PreAuthorize("hasRole('ADMIN') or this.isOwner(authentication.name, #userId)")
+    @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #userId)")
     public GetLoansPageResponseDto getAll(Long userId, int page, int size){
         Page<LoanEntity> loansPage;
 
@@ -58,7 +58,7 @@ public class LoanService extends OwnershipService
         return new GetLoansPageResponseDto(loansDto, loansPage.getNumber(), loansPage.getTotalElements(), loansPage.getTotalPages(), loansPage.hasNext());
     }
 
-    @PostAuthorize("hasRole('ADMIN') or this.isOwner(authentication.name, returnObject.user.id)")
+    @PostAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, returnObject.user.id)")
     public GetLoanResponseDto getOneById(long id){
         LoanEntity loan = loanRepository.findById(id).orElseThrow(() -> LoanWithIdNotFoundException.create(id));
         return mapLoan(loan);
@@ -69,7 +69,7 @@ public class LoanService extends OwnershipService
         return new GetLoanResponseDto(loan.getId(), user, book, loan.getLoanDate(), loan.getDueDate());
     }
 
-    @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #loanDto.userId)")
+    @PreAuthorize("hasRole('ADMIN') or isAuthenticated() and this.isOwner(authentication.name, #loan.userId)")
     public CreateLoanResponseDto create(CreateLoanDto loan){
         UserEntity user = userRepository.findById(loan.getUserId()).orElseThrow(()-> UserWithIdNotFoundException.create(loan.getUserId()));
         BookEntity book = bookRepository.findById(loan.getBookId()).orElseThrow(()-> BookWithIdNotFoundException.create(loan.getBookId()));
