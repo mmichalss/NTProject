@@ -1,0 +1,91 @@
+{
+  "language": "en",
+  "library": "Library",
+  "books": "Books",
+  "login": "Login",
+  "profile": "Profile",
+  "loans": "Loans",
+  "historyOfLoans": "History of loans",
+  "users": "Users",
+  "logout": "Logout",
+  "manageBooks": "Manage books",
+  "recomendations": "Our Recommendations",
+  "mostReadBooks": "Most read books",
+  "userId": "User ID",
+  "update": "Update",
+  "back": "Back",
+  "loginPage": {
+    "username": "username",
+    "password": "password",
+    "invalidUsernameOrPassword": "Invalid username or password",
+    "usernameCantBeEmpty": "Username can't be empty",
+    "passwordCantBeEmpty": "Password can't be empty",
+    "passwordMustBeAtLeast5Characters": "Password must be at least 5 characters long"
+  },
+  "bookPage": {
+    "title": "Manage books",
+    "label": {
+      "bookId": "Book ID",
+      "isbn": "ISBN",
+      "title": "Title",
+      "author": "Author",
+      "publisher": "Publisher",
+      "yearPublished": "Year published",
+      "available": "Available",
+      "numberOfAvailableCopies": "Number of available copies",
+      "loanDate": "Loan date",
+      "dueDate": "Due date",
+      "borrow": "Borrow",
+      "selected": "selected",
+      "borrowSelectedBooks": "Borrow selected",
+      "densePadding": "Dense padding",
+      "create": "Create",
+      "cancel": "Cancel"
+    }
+  },
+  "loanPage": {
+    "title": "Manage loans",
+    "label": {
+      "loanId": "Loan ID",
+      "bookTitle": "Book title",
+      "bookAuthor": "Book author",
+      "loanDate": "Loan date",
+      "dueDate": "Due date",
+      "returnDate": "Return date",
+      "densePadding": "Dense padding",
+      "return": "Return",
+      "loanCreatedSuccessfully": "Loan created successfully",
+      "loanCreationFailed": "Loan creation failed",
+      "loanDeletedSuccessfully": "Loan deleted successfully",
+      "loanDeletionFailed": "Loan deletion failed"
+    }
+  },
+  "userPage": {
+    "title": "Manage users",
+    "userId": "User ID",
+    "name": "Name",
+    "lastName": "Last name",
+    "email": "Email",
+    "addNew": "Add new"
+  },
+  "admin": {
+    "errors": {
+      "isbnAlreadyExists": "ISBN already exists",
+      "isbnCantBeEmpty": "ISBN can't be empty",
+      "titleCantBeEmpty": "Title can't be empty",
+      "authorCantBeEmpty": "Author can't be empty",
+      "publisherCantBeEmpty": "Publisher can't be empty",
+      "yearPublishedCantBeEmpty": "Year published can't be empty",
+      "availableCopiesCantBeEmpty": "Number of available copies can't be empty",
+      "userIdCantBeEmpty": "User ID can't be empty",
+      "bookIdCantBeEmpty": "Book ID can't be empty",
+      "dueDateCantBeEmpty": "Due date can't be empty"
+    }
+  },
+  "errors": {
+    "error": "An error occured",
+    "booksNotFound": "Books not found",
+    "usersNotFound": "Users not found",
+    "loansNotFound": "Loans not found"
+  }
+}

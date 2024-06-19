@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { useApi } from '../../api/ApiProvider';
-import { GetBookDto, GetBookMappedDto } from '../../api/dto/book/book.dto';
-import { ClientResponse } from '../../api/library-client';
+import { useApi } from './../api/ApiProvider';
+import { GetBookDto, GetBookMappedDto } from './../api/dto/book/book.dto';
+import { ClientResponse } from './../api/library-client';
 import React from 'react';
 
 export default function useBooks() {
   const apiClient = useApi();
-  const [rows, setBooks] = React.useState<GetBookMappedDto[] | undefined>();
+  const [books, setBooks] = React.useState<GetBookMappedDto[] | undefined>();
 
   const fetchBooks = useCallback(async () => {
     try {
@@ -45,5 +45,5 @@ export default function useBooks() {
     fetchBooks();
   }, [fetchBooks]);
 
-  return { rows, fetchBooks };
+  return { books, fetchBooks };
 }

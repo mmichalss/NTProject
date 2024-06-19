@@ -7,6 +7,7 @@ import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
 import axios, { AxiosInstance } from 'axios';
 import { useApi } from '../api/ApiProvider';
+import { useTranslation } from 'react-i18next';
 
 type FormValues = {
   username: string;
@@ -16,6 +17,7 @@ type FormValues = {
 function LoginForm() {
   const initialValues = { username: '', password: '' };
 
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const apiClient = useApi();
 
@@ -25,23 +27,26 @@ function LoginForm() {
         if (response.success) {
           navigate('/home');
         } else {
-          formik.setFieldError('password', 'Invalid username or password');
+          formik.setFieldError(
+            'password',
+            t('loginPage.invalidUsernameOrPassword'),
+          );
         }
       });
     },
-    [apiClient, navigate],
+    [apiClient, navigate, t],
   );
 
   const validationSchema = useMemo(
     () =>
       yup.object({
-        username: yup.string().required("username can't be empty"),
+        username: yup.string().required(t('loginPage.usernameCantBeEmpty')),
         password: yup
           .string()
-          .required("password can't be empty")
-          .min(5, 'password must be at least 5 characters'),
+          .required(t('loginPage.passwordCantBeEmpty'))
+          .min(5, t('loginPage.passwordMustBeAtLeast5Characters')),
       }),
-    [],
+    [t],
   );
 
   return (
@@ -61,16 +66,16 @@ function LoginForm() {
         >
           <TextField
             id="username"
-            label="username"
+            label={t('loginPage.username')}
             variant="outlined"
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            error={formik.touched.username && !!formik.errors.username} //!! = Boolean
+            error={formik.touched.username && !!formik.errors.username}
             helperText={formik.touched.username && formik.errors.username}
           />
           <TextField
             id="password"
-            label="password"
+            label={t('loginPage.password')}
             variant="outlined"
             type="password"
             onChange={formik.handleChange}
@@ -84,7 +89,7 @@ function LoginForm() {
             type="submit"
             disabled={!(formik.isValid && formik.dirty)}
           >
-            login
+            {t('login')}
           </Button>
         </form>
       )}

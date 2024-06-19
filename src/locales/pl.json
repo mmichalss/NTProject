@@ -1,0 +1,93 @@
+{
+  "language": "pl",
+  "library": "Biblioteka",
+  "books": "Książki",
+  "login": "Zaloguj",
+  "profile": "Profil",
+  "loans": "Wypożyczenia",
+  "historyOfLoans": "Historia wypożyczeń",
+  "users": "Użytkownicy",
+  "logout": "Wyloguj",
+  "manageBooks": "Zarządzaj książkami",
+  "recomendations": "Nasze Rekomendacje",
+  "mostReadBooks": "Najczęściej czytane książki",
+  "userId": "ID użytkownika",
+  "update": "Aktualizuj",
+  "back": "Powrót",
+  "loginPage": {
+    "username": "nazwa użytkownika",
+    "password": "hasło",
+    "loginError": "Nieprawidłowa nazwa użytkownika lub hasło",
+    "loginErrorTitle": "Błąd logowania",
+    "invalidUsernameOrPassword": "Nieprawidłowa nazwa użytkownika lub hasło",
+    "usernameCantBeEmpty": "Nazwa użytkownika nie może być pusta",
+    "passwordCantBeEmpty": "Hasło nie może być puste",
+    "passwordMustBeAtLeast5Characters": "Hasło musi mieć co najmniej 5 znaków"
+  },
+  "bookPage": {
+    "title": "Zarządzaj książkami",
+    "label": {
+      "bookId": "ID książki",
+      "isbn": "ISBN",
+      "title": "Tytuł",
+      "author": "Autor",
+      "publisher": "Wydawnictwo",
+      "yearPublished": "Rok wydania",
+      "available": "Dostępność",
+      "numberOfAvailableCopies": "Liczba dostępnych egzemplarzy",
+      "loanDate": "Data wypożyczenia",
+      "dueDate": "Data oddania",
+      "borrow": "Wypożycz",
+      "selected": "zaznaczono",
+      "borrowSelectedBooks": "Wypożycz wybrane",
+      "densePadding": "gęsta wyściółka",
+      "create": "Utwórz",
+      "cancel": "Anuluj"
+    }
+  },
+  "loanPage": {
+    "title": "Zarządzaj wypożyczeniami",
+    "label": {
+      "loanId": "ID wypożyczenia",
+      "bookTitle": "Tytuł książki",
+      "bookAuthor": "Autor książki",
+      "loanDate": "Data wypożyczenia",
+      "dueDate": "Termin zwrotu",
+      "returnDate": "Data zwrotu",
+      "densePadding": "gęsta wyściółka",
+      "return": "Zwróć",
+      "loanCreatedSuccessfully": "Wypożyczenie utworzone pomyślnie",
+      "loanCreationFailed": "Wypożyczenie nieudane",
+      "loanDeletedSuccessfully": "Wypożyczenie usunięte pomyślnie",
+      "loanDeletionFailed": "Usunięcie wypożyczenia nieudane"
+    }
+  },
+  "userPage": {
+    "title": "Zarządzaj użytkownikami",
+    "userId": "ID użytkownika",
+    "name": "Imię",
+    "lastName": "Nazwisko",
+    "email": "E-mail",
+    "addNew": "Dodaj"
+  },
+  "admin": {
+    "errors": {
+      "isbnAlreadyExists": "ISBN juz istnieje",
+      "isbnCantBeEmpty": "ISBN nie może być pusty",
+      "titleCantBeEmpty": "Tytuł nie może być pusty",
+      "authorCantBeEmpty": "Autor nie może być pusty",
+      "publisherCantBeEmpty": "Nazwa Wydawnictwa nie może być pusta",
+      "yearPublishedCantBeEmpty": "Rok wydania nie może być pusty",
+      "availableCopiesCantBeEmpty": "Liczba dostępnych egzemplarzy nie może być pusta",
+      "userIdCantBeEmpty": "ID użytkownika nie może być pusty",
+      "bookIdCantBeEmpty": "ID książki nie może być pusty",
+      "dueDateCantBeEmpty": "Termin zwrotu nie może być pusty"
+    }
+  },
+  "errors": {
+    "error": "Wystąpił błąd",
+    "booksNotFound": "Nie znaleziono książek",
+    "usersNotFound": "Nie znaleziono użytkowników",
+    "loansNotFound": "Nie znaleziono wypożyczeń"
+  }
+}

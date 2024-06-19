@@ -7,17 +7,24 @@ import { Button } from '@mui/material';
 import { Formik } from 'formik';
 import useGetMe from '../../users_page/getMe';
 import { Navigate, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import MySnackbar from '../../errors_and_snackbars/Snackbar';
 
 export default function CreateLoan({
   selected,
   userId,
+  onUpdate,
 }: {
   selected: readonly number[];
   userId: number | undefined;
+  onUpdate: () => void;
 }) {
   const apiClient = useApi();
   const userRole = apiClient.getUserRole();
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const loanData = useMemo(() => {
     return selected.map((bookId) => {
@@ -43,33 +50,57 @@ export default function CreateLoan({
     });
   }, [userId, selected]);
 
+  const { t } = useTranslation();
   const handleSubmit = useCallback(
     (loans: CreateLoanDto[]) => {
       if (userId === undefined) {
         navigate('/login');
         return;
       }
-      loans.forEach((loan) => {
-        apiClient.createLoan(loan);
+      loans.forEach(async (loan) => {
+        try {
+          const result = await apiClient.createLoan(loan);
+          if (result.success) {
+            setMessage(t('loanPage.label.loanCreatedSuccessfully'));
+            setOpen(true);
+            setSuccess(result.success);
+          } else {
+            setMessage(t('loanPage.label.loanCreationFailed'));
+            setOpen(true);
+            setSuccess(result.success);
+          }
+        } catch (error) {
+          setMessage('Error creating loan');
+          setOpen(true);
+        }
+        onUpdate();
       });
     },
-    [apiClient, navigate, userId],
+    [apiClient, navigate, userId, onUpdate, t],
   );
 
   return (
-    <Formik onSubmit={handleSubmit} initialValues={loanData}>
-      {(formik: any) => (
-        <form
-          id="create-loan"
-          className="Create-loan"
-          onSubmit={formik.handleSubmit}
-          noValidate
-        >
-          <Button variant="outlined" type="submit" disabled={!userId}>
-            Borrow Selected
-          </Button>
-        </form>
-      )}
-    </Formik>
+    <>
+      <Formik onSubmit={handleSubmit} initialValues={loanData}>
+        {(formik: any) => (
+          <form
+            id="create-loan"
+            className="Create-loan"
+            onSubmit={formik.handleSubmit}
+            noValidate
+          >
+            <Button variant="outlined" type="submit" disabled={!userId}>
+              {t('bookPage.label.borrowSelectedBooks')}
+            </Button>
+          </form>
+        )}
+      </Formik>
+      <MySnackbar
+        open={open}
+        message={message}
+        success={success}
+        setOpen={setOpen}
+      />
+    </>
   );
 }

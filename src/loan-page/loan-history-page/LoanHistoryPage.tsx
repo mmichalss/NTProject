@@ -1,17 +1,14 @@
 import { useTranslation } from 'react-i18next';
-import BookList from './book_list-form/Book_list-form';
+import LoanHistoryForm from './LoanHistoryForm';
 
-function BookPage() {
+export default function LoanHistoryPage() {
   const { t } = useTranslation();
-
   return (
     <>
       <div style={{ display: 'flex', justifyContent: 'center' }}>
-        <h1 style={{ textAlign: 'center' }}>{t('books')}</h1>
+        <h1 style={{ textAlign: 'center' }}>{t('historyOfLoans')}</h1>
       </div>
-      <BookList />
+      <LoanHistoryForm />
     </>
   );
 }
-
-export default BookPage;

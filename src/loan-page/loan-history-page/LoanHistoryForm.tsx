@@ -4,8 +4,6 @@ import { alpha } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import useLoans from '../loan-page/Loan_data';
-import { GetLoanDto, GetLoanPagesDto } from '../api/dto/loan/loan.dto';
 import {
   Box,
   FormControlLabel,
@@ -24,6 +22,11 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import {
+  GetLoanReturnedDto,
+  GetLoansReturnedPagesDto,
+} from '../../api/dto/loan/loan.dto';
+import useLoansReturned from './LoanHistoryData';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -66,7 +69,7 @@ function stableSort<T>(
 
 interface HeadCell {
   disablePadding: boolean;
-  id: keyof GetLoanDto;
+  id: keyof GetLoanReturnedDto;
   label: string;
   numeric: boolean;
 }
@@ -96,13 +99,19 @@ const headCells = (t: TFunction): readonly HeadCell[] => [
     disablePadding: false,
     label: t('loanPage.label.dueDate'),
   },
+  {
+    id: 'returnDate',
+    numeric: false,
+    disablePadding: false,
+    label: t('loanPage.label.returnDate'),
+  },
 ];
 
 interface EnhancedTableProps {
   numSelected: number;
   onRequestSort: (
     event: React.MouseEvent<unknown>,
-    property: keyof GetLoanDto,
+    property: keyof GetLoanReturnedDto,
   ) => void;
   order: Order;
   orderBy: string;
@@ -113,7 +122,8 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, onRequestSort } = props;
   const { t } = useTranslation();
   const createSortHandler =
-    (property: keyof GetLoanDto) => (event: React.MouseEvent<unknown>) => {
+    (property: keyof GetLoanReturnedDto) =>
+    (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
     };
 
@@ -196,13 +206,13 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
 
 function LoanList() {
   const [order, setOrder] = useState<Order>('asc');
-  const [orderBy, setOrderBy] = useState<keyof GetLoanDto>('bookTitle');
+  const [orderBy, setOrderBy] = useState<keyof GetLoanReturnedDto>('bookTitle');
   const [selected, setSelected] = useState<readonly number[]>([]);
   const [page, setPage] = useState(0);
   const [dense, setDense] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState(5);
 
-  const { data, fetchLoans, loading, error } = useLoans();
+  const { data, fetchLoans, loading, error } = useLoansReturned();
 
   useEffect(() => {
     fetchLoans(page, rowsPerPage);
@@ -210,16 +220,17 @@ function LoanList() {
 
   const { t } = useTranslation();
 
-  const mapLoans = (loansPaged: GetLoanPagesDto) => {
+  const mapLoans = (loansPaged: GetLoansReturnedPagesDto) => {
     const loans = loansPaged.loans;
     return loans.map(
       (loan) =>
-        new GetLoanDto(
+        new GetLoanReturnedDto(
           loan.id,
           loan.book.title,
           loan.book.author,
           new Date(loan.loanDate).toISOString().split('T')[0],
           new Date(loan.dueDate).toISOString().split('T')[0],
+          new Date(loan.returnDate).toISOString().split('T')[0],
         ),
     );
   };
@@ -231,7 +242,7 @@ function LoanList() {
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
-    property: keyof GetLoanDto,
+    property: keyof GetLoanReturnedDto,
   ) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -306,6 +317,7 @@ function LoanList() {
                     <TableCell align="left">{row.bookAuthor}</TableCell>
                     <TableCell align="left">{row.loanDate}</TableCell>
                     <TableCell align="left">{row.dueDate}</TableCell>
+                    <TableCell align="left">{row.returnDate}</TableCell>
                   </TableRow>
                 );
               })}

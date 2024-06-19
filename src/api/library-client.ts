@@ -1,12 +1,16 @@
 import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { LoginRequestDto } from './dto/login/login-request.dto';
-import { GetBookDto, GetBookMappedDto } from './dto/book/book.dto';
+import {
+  GetBookDto,
+  CreateBookDto,
+  CreateBookResponseDto,
+} from './dto/book/book.dto';
 import {
   CreateLoanDto,
   CreateLoanResponseDto,
-  GetLoanDto,
   GetLoanPagesDto,
-  GetWholeLoanDto,
+  GetLoanReturnedDto,
+  GetLoansReturnedPagesDto,
 } from './dto/loan/loan.dto';
 import {
   GetUserDto,
@@ -15,6 +19,7 @@ import {
 } from './dto/user/user.dto';
 import { RegisterDto, RegisterResponseDto } from './dto/register/register.dto';
 import { JwtPayload, jwtDecode } from 'jwt-decode';
+import Cookies from 'universal-cookie';
 
 export type ClientResponse<T> = {
   success: boolean;
@@ -30,6 +35,7 @@ export class LibraryClient {
   private baseUrl = 'http://localhost:8080/api';
   private client: AxiosInstance;
   private token: string | null = null;
+  private cookies = new Cookies();
 
   constructor() {
     this.client = axios.create({
@@ -37,9 +43,8 @@ export class LibraryClient {
     });
 
     this.client.interceptors.request.use((config) => {
-      if (this.token) {
-        config.headers['Authorization'] = `Bearer ${this.token}`;
-      }
+      const token = this.cookies.get('token');
+      config.headers.Authorization = `Bearer ${token}`;
       return config;
     });
   }
@@ -53,10 +58,13 @@ export class LibraryClient {
         data,
       );
 
-      this.token = response.data.token;
-      this.client.defaults.headers.common['Authorization'] =
-        `Bearer ${this.token}`;
+      const decoded = jwtDecode<JwtPayload>(response.data.token);
 
+      if (decoded.exp) {
+        this.cookies.set('token', response.data.token, {
+          expires: new Date(decoded.exp * 1000),
+        });
+      }
       return {
         success: true,
         data: undefined,
@@ -74,9 +82,7 @@ export class LibraryClient {
   }
 
   public getUserRole(): string {
-    const token = this.client.defaults.headers.common[
-      'Authorization'
-    ] as string;
+    const token = this.cookies.get('token');
     if (token) {
       const decoded = jwtDecode<RoleJwtPayload>(token);
       if (decoded.role) {
@@ -87,8 +93,7 @@ export class LibraryClient {
   }
 
   public logout(): void {
-    this.token = null;
-    delete this.client.defaults.headers.common['Authorization'];
+    this.cookies.remove('token');
   }
 
   public async getMe(): Promise<ClientResponse<GetUserDto | undefined>> {
@@ -135,10 +140,56 @@ export class LibraryClient {
       };
     }
   }
+  public async createBook(
+    data: CreateBookDto,
+  ): Promise<ClientResponse<CreateBookResponseDto | undefined>> {
+    try {
+      const response: AxiosResponse<CreateBookResponseDto> =
+        await this.client.post('books', data);
 
-  public async getAllLoans(): Promise<
-    ClientResponse<GetLoanPagesDto | undefined>
-  > {
+      console.log(response.data);
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+
+  public async deleteBook(
+    id: number,
+  ): Promise<ClientResponse<undefined | Error>> {
+    try {
+      const response: AxiosResponse = await this.client.delete(`books/${id}`);
+
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      console.log(error);
+
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+
+  public async getAllLoansUsers(
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ClientResponse<GetLoanPagesDto | undefined>> {
     try {
       const meResponse = await this.getMe();
       if (!meResponse.success || !meResponse.data) {
@@ -150,6 +201,8 @@ export class LibraryClient {
         `loans`,
         {
           params: {
+            page: page,
+            size: size,
             userId: id,
           },
         },
@@ -164,6 +217,140 @@ export class LibraryClient {
     } catch (error) {
       const axiosError = error as AxiosError<Error>;
 
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+  public async getAllLoansReturnedUsers(
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ClientResponse<GetLoansReturnedPagesDto | undefined>> {
+    try {
+      const meResponse = await this.getMe();
+      if (!meResponse.success || !meResponse.data) {
+        throw new Error('Unable to retrieve user information');
+      }
+
+      const id: number = meResponse.data.id;
+      const response: AxiosResponse<GetLoansReturnedPagesDto> =
+        await this.client.get(`loans/returned`, {
+          params: {
+            page: page,
+            size: size,
+            userId: id,
+          },
+        });
+
+      console.log(response.data);
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+
+  public async getAllLoansAdmin(
+    userId: number,
+    page: number = 1,
+    size: number = 10,
+  ): Promise<ClientResponse<GetLoanPagesDto | undefined>> {
+    try {
+      const response: AxiosResponse<GetLoanPagesDto> = await this.client.get(
+        `loans`,
+        {
+          params: {
+            page: page,
+            size: size,
+            userId: userId,
+          },
+        },
+      );
+
+      console.log(response.data);
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+  public async createLoan(
+    data: CreateLoanDto,
+  ): Promise<ClientResponse<CreateLoanResponseDto | undefined>> {
+    try {
+      const response: AxiosResponse<CreateLoanResponseDto> =
+        await this.client.post('loans', data);
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+
+  public async deleteLoan(
+    id: number,
+  ): Promise<ClientResponse<undefined | Error>> {
+    try {
+      const response: AxiosResponse = await this.client.delete(`loans/${id}`);
+
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      console.log(error);
+
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
+  public async returnBook(
+    loanId: number,
+  ): Promise<ClientResponse<GetLoanReturnedDto | undefined>> {
+    try {
+      const response: AxiosResponse<GetLoanReturnedDto> =
+        await this.client.patch(`loans/${loanId}`);
+
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
       return {
         success: false,
         data: undefined,
@@ -225,26 +412,6 @@ export class LibraryClient {
       const response: AxiosResponse<UpdateUserResponseDto> =
         await this.client.patch(`users/${id}`, data);
 
-      return {
-        success: true,
-        data: response.data,
-        status: response.status,
-      };
-    } catch (error) {
-      const axiosError = error as AxiosError<Error>;
-      return {
-        success: false,
-        data: undefined,
-        status: axiosError.response?.status || 0,
-      };
-    }
-  }
-  public async createLoan(
-    data: CreateLoanDto,
-  ): Promise<ClientResponse<CreateLoanResponseDto | undefined>> {
-    try {
-      const response: AxiosResponse<CreateLoanResponseDto> =
-        await this.client.post('loans', data);
       return {
         success: true,
         data: response.data,

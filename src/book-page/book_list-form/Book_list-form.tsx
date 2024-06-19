@@ -25,6 +25,11 @@ import { visuallyHidden } from '@mui/utils';
 import { useApi } from '../../api/ApiProvider';
 import CreateLoan from './Create_loan';
 import useGetMe from '../../users_page/getMe';
+import { useTranslation } from 'react-i18next';
+import { TFunction } from 'i18next';
+import { enqueueSnackbar } from 'notistack';
+import ErrorPage from '../../errors_and_snackbars/ErrorPage';
+import MySnackbar from '../../errors_and_snackbars/Snackbar';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -50,10 +55,6 @@ function getComparator<Key extends keyof any>(
     : (a, b) => -descendingComparator(a, b, orderBy);
 }
 
-// Since 2020 all major browsers ensure sort stability with Array.prototype.sort().
-// stableSort() brings sort stability to non-modern browsers (notably IE11). If you
-// only support modern browsers you can replace stableSort(exampleArray, exampleComparator)
-// with exampleArray.slice().sort(exampleComparator)
 function stableSort<T>(
   array: readonly T[],
   comparator: (a: T, b: T) => number,
@@ -76,44 +77,46 @@ interface HeadCell {
   numeric: boolean;
 }
 
-const headCells: readonly HeadCell[] = [
-  {
-    id: 'isbn',
-    numeric: false,
-    disablePadding: true,
-    label: 'isbn',
-  },
-  {
-    id: 'title',
-    numeric: false,
-    disablePadding: false,
-    label: 'title',
-  },
-  {
-    id: 'author',
-    numeric: false,
-    disablePadding: false,
-    label: 'author',
-  },
-  {
-    id: 'publisher',
-    numeric: false,
-    disablePadding: false,
-    label: 'pubsliher',
-  },
-  {
-    id: 'yearPublished',
-    numeric: false,
-    disablePadding: false,
-    label: 'year_published',
-  },
-  {
-    id: 'available',
-    numeric: false,
-    disablePadding: false,
-    label: 'is_available',
-  },
-];
+const headCells = (t: TFunction): readonly HeadCell[] => {
+  return [
+    {
+      id: 'isbn',
+      numeric: false,
+      disablePadding: true,
+      label: t('bookPage.label.isbn'),
+    },
+    {
+      id: 'title',
+      numeric: false,
+      disablePadding: false,
+      label: t('bookPage.label.title'),
+    },
+    {
+      id: 'author',
+      numeric: false,
+      disablePadding: false,
+      label: t('bookPage.label.author'),
+    },
+    {
+      id: 'publisher',
+      numeric: false,
+      disablePadding: false,
+      label: t('bookPage.label.publisher'),
+    },
+    {
+      id: 'yearPublished',
+      numeric: false,
+      disablePadding: false,
+      label: t('bookPage.label.yearPublished'),
+    },
+    {
+      id: 'available',
+      numeric: false,
+      disablePadding: false,
+      label: t('bookPage.label.available'),
+    },
+  ];
+};
 
 interface EnhancedTableProps {
   numSelected: number;
@@ -128,6 +131,9 @@ interface EnhancedTableProps {
 
 function EnhancedTableHead(props: EnhancedTableProps) {
   const { order, orderBy, numSelected, rowCount, onRequestSort } = props;
+  const { t } = useTranslation();
+  const apiClient = useApi();
+  const userRole = apiClient.getUserRole();
   const createSortHandler =
     (property: keyof GetBookDto) => (event: React.MouseEvent<unknown>) => {
       onRequestSort(event, property);
@@ -136,10 +142,14 @@ function EnhancedTableHead(props: EnhancedTableProps) {
   return (
     <TableHead>
       <TableRow>
-        <TableCell align="left" padding="normal">
-          Borrow
-        </TableCell>
-        {headCells.map((headCell) => (
+        {userRole === 'ROLE_READER' || userRole === 'ROLE_ADMIN' ? (
+          <TableCell align="left" padding="normal">
+            {t('bookPage.label.borrow')}
+          </TableCell>
+        ) : (
+          <TableCell align="left" padding="normal" />
+        )}
+        {headCells(t).map((headCell: HeadCell) => (
           <TableCell
             key={headCell.id}
             align={headCell.numeric ? 'right' : 'left'}
@@ -169,12 +179,14 @@ interface EnhancedTableToolbarProps {
   numSelected: number;
   selected: readonly number[];
   userId: number | undefined;
+  updateBooks: any;
 }
 
-function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-  const { numSelected } = props;
-  const { selected } = props;
-  const { userId } = props;
+function EnhancedTableToolbar(
+  props: EnhancedTableToolbarProps & { updateBooks: () => void },
+) {
+  const { numSelected, selected, userId, updateBooks } = props;
+  const { t } = useTranslation();
   return (
     <Toolbar
       sx={{
@@ -196,7 +208,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           variant="subtitle1"
           component="div"
         >
-          {numSelected} selected
+          {numSelected} {t('bookPage.label.selected')}
         </Typography>
       ) : (
         <Typography
@@ -204,13 +216,15 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
           variant="h6"
           id="tableTitle"
           component="div"
-        >
-          Books
-        </Typography>
+        ></Typography>
       )}
       {numSelected > 0 ? (
         <Tooltip title="Borrow">
-          <CreateLoan selected={selected} userId={userId} />
+          <CreateLoan
+            selected={selected}
+            userId={userId}
+            onUpdate={updateBooks}
+          />
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
@@ -231,11 +245,20 @@ function BookList() {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const apiClient = useApi();
-
-  const rows = useBooks();
   const userRole = apiClient.getUserRole();
-
   const userId = useGetMe()?.id;
+
+  const { t } = useTranslation();
+
+  const { rows, fetchBooks } = useBooks();
+
+  const updateBooks = () => {
+    fetchBooks();
+  };
+
+  React.useEffect(() => {
+    fetchBooks();
+  }, [fetchBooks]);
 
   const visibleRows = React.useMemo(() => {
     if (rows === undefined) {
@@ -249,7 +272,7 @@ function BookList() {
   }, [order, orderBy, page, rowsPerPage, rows]);
 
   if (rows === undefined) {
-    return <div>No books available</div>;
+    return <ErrorPage errorName={t('errors.booksNotFound')} />;
   } else {
     const handleRequestSort = (
       event: React.MouseEvent<unknown>,
@@ -314,6 +337,7 @@ function BookList() {
               numSelected={selected.length}
               selected={selected}
               userId={userId}
+              updateBooks={updateBooks}
             />
           )}
           <TableContainer>
@@ -337,8 +361,10 @@ function BookList() {
                   return (
                     <TableRow
                       hover={row.available === 'true'}
-                      onClick={(event) =>
-                        handleClick(event, row.id, row.available)
+                      onClick={
+                        userRole !== 'ROLE_ADMIN' && userRole !== 'ROLE_READER'
+                          ? undefined
+                          : (event) => handleClick(event, row.id, row.available)
                       }
                       role="checkbox"
                       aria-checked={isItemSelected}
@@ -348,7 +374,9 @@ function BookList() {
                       sx={{ cursor: 'pointer' }}
                     >
                       <TableCell padding="checkbox">
-                        {row.available === 'true' ? (
+                        {row.available === 'true' &&
+                        (userRole === 'ROLE_READER' ||
+                          userRole === 'ROLE_ADMIN') ? (
                           <Checkbox
                             color="primary"
                             checked={isItemSelected}
@@ -398,7 +426,7 @@ function BookList() {
         </Paper>
         <FormControlLabel
           control={<Switch checked={dense} onChange={handleChangeDense} />}
-          label="Dense padding"
+          label={t('bookPage.label.densePadding')}
         />
       </Box>
     );

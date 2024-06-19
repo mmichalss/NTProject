@@ -35,3 +35,22 @@ export class GetBookMappedDto {
     this.available = available.toString();
   }
 }
+
+export class CreateBookDto {
+  isbn: string = '';
+  title: string = '';
+  author: string = '';
+  publisher: string = '';
+  yearPublished: number = 0;
+  availableCopies: number = 0;
+}
+
+export class CreateBookResponseDto {
+  id: number = 0;
+  isbn: string = '';
+  title: string = '';
+  author: string = '';
+  publisher: string = '';
+  yearPublished: number = 0;
+  availableCopies: number = 0;
+}

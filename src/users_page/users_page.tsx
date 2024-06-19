@@ -1,12 +1,13 @@
-import { Button } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import UsersForm from './users_form';
-import AddNewUser from './addNewUser';
 
 export default function UsersPage() {
+  const { t } = useTranslation();
   return (
     <>
-      <h1>Users Page</h1>
-      <AddNewUser />
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <h1 style={{ textAlign: 'center' }}>{t('userPage.title')}</h1>
+      </div>
       <UsersForm />
     </>
   );
