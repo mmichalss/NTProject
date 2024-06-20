@@ -27,7 +27,7 @@ public class LoanEntity {
     private Date dueDate;
     @Basic
     @Column(name = "return_date")
-    private Date return_date;
+    private Date returnDate;
 
     public long getId() {
         return id;
@@ -69,11 +69,11 @@ public class LoanEntity {
         this.dueDate = dueDate;
     }
 
-    public Date getReturn_date() {
-        return return_date;
+    public Date getReturnDate() {
+        return returnDate;
     }
 
-    public void setReturn_date(Date return_date) {
-        this.return_date = return_date;
+    public void setReturnDate(Date return_date) {
+        this.returnDate = return_date;
     }
 }
