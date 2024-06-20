@@ -5,12 +5,21 @@ import { useApi } from '../api/ApiProvider';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 
-interface UpdateUserProps {
+interface Props {
   userId: number;
-  onUpdate: () => void; // Callback to update the user list
+  onUpdate: () => void;
+  setMessage: (message: string) => void;
+  setSuccess: (success: boolean) => void;
+  setOpen: (open: boolean) => void;
 }
 
-export default function UpdateUser({ userId, onUpdate }: UpdateUserProps) {
+export default function UpdateUser({
+  userId,
+  onUpdate,
+  setMessage,
+  setSuccess,
+  setOpen,
+}: Props) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
@@ -22,12 +31,20 @@ export default function UpdateUser({ userId, onUpdate }: UpdateUserProps) {
     (values: UpdateUserDto, formik: any) => {
       apiClient.updateUser(userId, values).then((response) => {
         if (response.success) {
+          setMessage(t('admin.snackbar.userUpdatedSuccessfully'));
+          setOpen(true);
+          setSuccess(response.success);
           onUpdate();
         } else {
         }
+        setMessage(
+          t('admin.snackbar.userUpdateFailed') + ` status: ${response.status}`,
+        );
+        setOpen(true);
+        setSuccess(response.success);
       });
     },
-    [apiClient, userId, onUpdate],
+    [apiClient, userId, setMessage, t, setOpen, setSuccess, onUpdate],
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -62,19 +79,19 @@ export default function UpdateUser({ userId, onUpdate }: UpdateUserProps) {
               <form onSubmit={formik.handleSubmit}>
                 <TextField
                   id="name"
-                  label="Name"
+                  label={t('userPage.name')}
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
                 <TextField
                   id="lastName"
-                  label="Last Name"
+                  label={t('userPage.lastName')}
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
                 <TextField
                   id="email"
-                  label="Email"
+                  label={t('userPage.email')}
                   variant="outlined"
                   onChange={formik.handleChange}
                 />

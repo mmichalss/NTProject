@@ -2,14 +2,26 @@ import * as React from 'react';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
-import { TextField } from '@mui/material';
+import { MenuItem, TextField } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../api/ApiProvider';
 import { RegisterDto } from '../api/dto/register/register.dto';
 import { Formik } from 'formik';
 import { useTranslation } from 'react-i18next';
 
-export default function AddNewUser({ onUpdate }: { onUpdate: () => void }) {
+interface Props {
+  onUpdate: () => void;
+  setMessage: (message: string) => void;
+  setSuccess: (success: boolean) => void;
+  setOpen: (open: boolean) => void;
+}
+
+export default function AddNewUser({
+  onUpdate,
+  setMessage,
+  setSuccess,
+  setOpen,
+}: Props) {
   const [anchorEl, setAnchorEl] = React.useState<HTMLButtonElement | null>(
     null,
   );
@@ -21,12 +33,21 @@ export default function AddNewUser({ onUpdate }: { onUpdate: () => void }) {
     (values: RegisterDto, formik: any) => {
       apiClient.register(values).then((response) => {
         if (response.success) {
+          setMessage(t('admin.snackbar.userCreatedSuccessfully'));
+          setOpen(true);
+          setSuccess(response.success);
           onUpdate();
         } else {
+          setMessage(
+            t('admin.snackbar.userCreationFailed') +
+              ` status: ${response.status}`,
+          );
+          setOpen(true);
+          setSuccess(response.success);
         }
       });
     },
-    [apiClient, onUpdate],
+    [apiClient, onUpdate, setMessage, setOpen, setSuccess, t],
   );
 
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -65,26 +86,31 @@ export default function AddNewUser({ onUpdate }: { onUpdate: () => void }) {
               <form onSubmit={formik.handleSubmit}>
                 <TextField
                   id="username"
-                  label="Username"
+                  label={t('userPage.username')}
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
                 <TextField
                   id="password"
-                  label="Password"
+                  label={t('userPage.password')}
                   type="password"
                   variant="outlined"
                   onChange={formik.handleChange}
                 />
                 <TextField
                   id="role"
-                  label="Role"
+                  label={t('userPage.role')}
                   variant="outlined"
+                  select
+                  size="medium"
                   onChange={formik.handleChange}
-                />
+                >
+                  <MenuItem value="ROLE_READER">ROLE_READER</MenuItem>
+                  <MenuItem value="ROLE_ADMIN">ROLE_ADMIN</MenuItem>
+                </TextField>
                 <TextField
                   id="email"
-                  label="Email"
+                  label={t('userPage.email')}
                   variant="outlined"
                   onChange={formik.handleChange}
                 />

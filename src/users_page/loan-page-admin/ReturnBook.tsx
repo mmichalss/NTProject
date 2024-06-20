@@ -22,11 +22,11 @@ export default function ReturnBook({
   const returnBook = async () => {
     const result = await apiClient.returnBook(loanId);
     if (result.success) {
-      setMessage(t('loanPage.label.loanReturnedSuccessfully'));
+      setMessage(t('admin.snackbar.loanReturnedSuccessfully'));
       setOpen(true);
       setSuccess(result.success);
     } else {
-      setMessage(t('loanPage.label.loanReturnFailed'));
+      setMessage(t('admin.snackbar.loanReturnFailed'));
       setOpen(true);
       setSuccess(result.success);
     }

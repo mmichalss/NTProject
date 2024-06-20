@@ -13,7 +13,10 @@
   "mostReadBooks": "Najczęściej czytane książki",
   "userId": "ID użytkownika",
   "update": "Aktualizuj",
+  "change": "Zmień",
   "back": "Powrót",
+  "FORBIDDEN": "DOSTĘP ZABRONIONY",
+  "forbiddenText": "Włamywanie się nie jest dozwolone...",
   "loginPage": {
     "username": "nazwa użytkownika",
     "password": "hasło",
@@ -42,7 +45,8 @@
       "borrowSelectedBooks": "Wypożycz wybrane",
       "densePadding": "gęsta wyściółka",
       "create": "Utwórz",
-      "cancel": "Anuluj"
+      "cancel": "Anuluj",
+      "bookCreatedSuccessfully": "Książka została utworzona"
     }
   },
   "loanPage": {
@@ -55,14 +59,14 @@
       "dueDate": "Termin zwrotu",
       "returnDate": "Data zwrotu",
       "densePadding": "gęsta wyściółka",
-      "return": "Zwróć",
-      "loanCreatedSuccessfully": "Wypożyczenie utworzone pomyślnie",
-      "loanCreationFailed": "Wypożyczenie nieudane",
-      "loanDeletedSuccessfully": "Wypożyczenie usunięte pomyślnie",
-      "loanDeletionFailed": "Usunięcie wypożyczenia nieudane"
+      "return": "Zwróć"
     }
   },
   "userPage": {
+    "username": "Nazwa użytkownika",
+    "password": "Hasło",
+    "role": "Rola",
+    "userProfile": "Profil użytkownika",
     "title": "Zarządzaj użytkownikami",
     "userId": "ID użytkownika",
     "name": "Imię",
@@ -82,6 +86,22 @@
       "userIdCantBeEmpty": "ID użytkownika nie może być pusty",
       "bookIdCantBeEmpty": "ID książki nie może być pusty",
       "dueDateCantBeEmpty": "Termin zwrotu nie może być pusty"
+    },
+    "snackbar": {
+      "loanCreatedSuccessfully": "Wypożyczenie utworzone pomyślnie",
+      "loanCreationFailed": "Wypożyczenie nieudane",
+      "loanDeletedSuccessfully": "Wypożyczenie usunięte pomyślnie",
+      "loanDeletionFailed": "Usunięcie wypożyczenia nieudane",
+      "loanReturnedSuccessfully": "Zwrot książki się powiódł",
+      "loanReturnFailed": "Zwrot książki się nie powiódł",
+      "userCreatedSuccessfully": "Użytkownik został utworzony",
+      "userCreationFailed": "Użytkownik nie został utworzony",
+      "userDeletedSuccessfully": "Użytkownik został usunięty",
+      "userDeletionFailed": "Użytkownik nie został usunięty",
+      "bookCreatedSuccessfully": "Książka została utworzona",
+      "bookCreationFailed": "Książka nie została utworzona",
+      "bookDeletedSuccessfully": "Książka została usunięta",
+      "bookDeletionFailed": "Usunięcie książki nieudane"
     }
   },
   "errors": {

@@ -246,7 +246,8 @@ function BookList() {
 
   const apiClient = useApi();
   const userRole = apiClient.getUserRole();
-  const userId = useGetMe()?.id;
+  const { me, fetchMe } = useGetMe();
+  const userId = me?.id;
 
   const { t } = useTranslation();
 

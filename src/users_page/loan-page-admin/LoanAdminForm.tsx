@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import useLoans from './LoanAdminData';
 import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
-import CreateBook from '../../book-page-admin/CreateBook';
 import {
   Button,
   Paper,
@@ -18,6 +17,8 @@ import DeleteLoan from './DeleteLoan';
 import CreateLoan from './CreateLoan';
 import { useNavigate } from 'react-router-dom';
 import ReturnBook from './ReturnBook';
+import React from 'react';
+import MySnackbar from '../../errors_and_snackbars/Snackbar';
 
 export default function LoanAdminForm({ userId }: { userId: number }) {
   const { t } = useTranslation();
@@ -27,6 +28,10 @@ export default function LoanAdminForm({ userId }: { userId: number }) {
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [success, setSuccess] = React.useState(false);
 
   const updateLoans = () => {
     enqueueSnackbar('Loan alternated', { variant: 'success' });
@@ -100,7 +105,13 @@ export default function LoanAdminForm({ userId }: { userId: number }) {
                   <ReturnBook loanId={row.id} onReturn={updateLoans} />
                 </TableCell>
                 <TableCell align="right">
-                  <DeleteLoan loanId={row.id} onDelete={updateLoans} />
+                  <DeleteLoan
+                    loanId={row.id}
+                    onDelete={updateLoans}
+                    setMessage={setMessage}
+                    setSuccess={setSuccess}
+                    setOpen={setOpen}
+                  />
                 </TableCell>
               </TableRow>
             ))}
@@ -115,6 +126,12 @@ export default function LoanAdminForm({ userId }: { userId: number }) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+      <MySnackbar
+        open={open}
+        message={message}
+        success={success}
+        setOpen={setOpen}
+      />
     </>
   );
 }

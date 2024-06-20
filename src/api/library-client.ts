@@ -426,4 +426,27 @@ export class LibraryClient {
       };
     }
   }
+
+  public async deleteUser(
+    id: number,
+  ): Promise<ClientResponse<undefined | Error>> {
+    try {
+      const response: AxiosResponse = await this.client.delete(`users/${id}`);
+
+      return {
+        success: true,
+        data: response.data,
+        status: response.status,
+      };
+    } catch (error) {
+      const axiosError = error as AxiosError<Error>;
+      console.log(error);
+
+      return {
+        success: false,
+        data: undefined,
+        status: axiosError.response?.status || 0,
+      };
+    }
+  }
 }
