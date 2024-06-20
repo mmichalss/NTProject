@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { useEffect } from 'react';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -8,19 +7,20 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import useBooks from './Book-page-admin-data';
-import { GetBookMappedDto } from '../api/dto/book/book.dto';
 import DeleteBook from './DeleteBook';
-import { useSnackbar } from 'notistack';
 import { useTranslation } from 'react-i18next';
 import CreateBook from './CreateBook';
+import MySnackbar from '../errors_and_snackbars/Snackbar';
+import React from 'react';
 
 export default function BookFormAdmin() {
   const { t } = useTranslation();
-  const { enqueueSnackbar } = useSnackbar();
   const { books, fetchBooks } = useBooks();
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [success, setSuccess] = React.useState(false);
 
   const updateBooks = () => {
-    enqueueSnackbar('Book alternated', { variant: 'success' });
     fetchBooks();
   };
 
@@ -73,13 +73,25 @@ export default function BookFormAdmin() {
                 <TableCell align="right">{row.yearPublished}</TableCell>
                 <TableCell align="right">{row.available}</TableCell>
                 <TableCell align="right">
-                  <DeleteBook bookId={row.id} onDelete={updateBooks} />
+                  <DeleteBook
+                    bookId={row.id}
+                    onDelete={updateBooks}
+                    setMessage={setMessage}
+                    setSuccess={setSuccess}
+                    setOpen={setOpen}
+                  />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </TableContainer>
+      <MySnackbar
+        open={open}
+        message={message}
+        success={success}
+        setOpen={setOpen}
+      />
     </>
   );
 }

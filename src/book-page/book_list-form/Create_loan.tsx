@@ -1,12 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useApi } from '../../api/ApiProvider';
 import { CreateLoanDto } from '../../api/dto/loan/loan.dto';
-import { GetUserDto } from '../../api/dto/user/user.dto';
-import React from 'react';
 import { Button } from '@mui/material';
 import { Formik } from 'formik';
-import useGetMe from '../../users_page/getMe';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import MySnackbar from '../../errors_and_snackbars/Snackbar';
 
@@ -61,11 +58,11 @@ export default function CreateLoan({
         try {
           const result = await apiClient.createLoan(loan);
           if (result.success) {
-            setMessage(t('loanPage.label.loanCreatedSuccessfully'));
+            setMessage(t('admin.snackbar.loanCreatedSuccessfully'));
             setOpen(true);
             setSuccess(result.success);
           } else {
-            setMessage(t('loanPage.label.loanCreationFailed'));
+            setMessage(t('admin.snackbar.loanCreationFailed'));
             setOpen(true);
             setSuccess(result.success);
           }

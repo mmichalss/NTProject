@@ -12,14 +12,20 @@ import { Button, Link } from '@mui/material';
 import UpdateUser from './updateUser';
 import AddNewUser from './addNewUser';
 import { useTranslation } from 'react-i18next';
+import MySnackbar from '../errors_and_snackbars/Snackbar';
+import DeleteUser from './DeleteUser';
 
 export default function UsersForm() {
-  const { users, fetchUsers } = useUsersData(); // Destructure users and fetchUsers
+  const { users, fetchUsers } = useUsersData();
   const [rowsState, setRowsState] = React.useState<GetUserDto[] | undefined>(
     users,
   );
 
   const { t } = useTranslation();
+
+  const [open, setOpen] = React.useState(false);
+  const [message, setMessage] = React.useState('');
+  const [success, setSuccess] = React.useState(false);
 
   React.useEffect(() => {
     fetchUsers(); // Initial fetch
@@ -38,7 +44,12 @@ export default function UsersForm() {
   function BasicTable() {
     return (
       <>
-        <AddNewUser onUpdate={updateUsers} />
+        <AddNewUser
+          onUpdate={updateUsers}
+          setMessage={setMessage}
+          setSuccess={setSuccess}
+          setOpen={setOpen}
+        />
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 650 }} aria-label="simple table">
             <TableHead>
@@ -48,6 +59,7 @@ export default function UsersForm() {
                 <TableCell align="right">{t('userPage.email')}</TableCell>
                 <TableCell align="right">{t('userPage.name')}</TableCell>
                 <TableCell align="right">{t('userPage.lastName')}</TableCell>
+                <TableCell align="right"> </TableCell>
                 <TableCell align="right"> </TableCell>
               </TableRow>
             </TableHead>
@@ -67,13 +79,34 @@ export default function UsersForm() {
                   <TableCell align="right">{row.name}</TableCell>
                   <TableCell align="right">{row.lastName}</TableCell>
                   <TableCell align="right">
-                    <UpdateUser userId={row.id} onUpdate={updateUsers} />
+                    <UpdateUser
+                      userId={row.id}
+                      onUpdate={updateUsers}
+                      setMessage={setMessage}
+                      setSuccess={setSuccess}
+                      setOpen={setOpen}
+                    />
+                  </TableCell>
+                  <TableCell align="right">
+                    <DeleteUser
+                      userId={row.id}
+                      onDelete={updateUsers}
+                      setMessage={setMessage}
+                      setSuccess={setSuccess}
+                      setOpen={setOpen}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <MySnackbar
+          open={open}
+          message={message}
+          success={success}
+          setOpen={setOpen}
+        />
       </>
     );
   }

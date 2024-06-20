@@ -33,5 +33,5 @@ export default function useGetMe() {
     fetchMe();
   }, [fetchMe]);
 
-  return me;
+  return { me, fetchMe };
 }

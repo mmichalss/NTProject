@@ -13,7 +13,10 @@
   "mostReadBooks": "Most read books",
   "userId": "User ID",
   "update": "Update",
+  "change": "Change",
   "back": "Back",
+  "FORBIDDEN": "FORBIDDEN",
+  "forbiddenText": "Trespassing is not allowed...",
   "loginPage": {
     "username": "username",
     "password": "password",
@@ -40,7 +43,8 @@
       "borrowSelectedBooks": "Borrow selected",
       "densePadding": "Dense padding",
       "create": "Create",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "bookCreatedSuccessfully": "Book created successfully"
     }
   },
   "loanPage": {
@@ -53,14 +57,14 @@
       "dueDate": "Due date",
       "returnDate": "Return date",
       "densePadding": "Dense padding",
-      "return": "Return",
-      "loanCreatedSuccessfully": "Loan created successfully",
-      "loanCreationFailed": "Loan creation failed",
-      "loanDeletedSuccessfully": "Loan deleted successfully",
-      "loanDeletionFailed": "Loan deletion failed"
+      "return": "Return"
     }
   },
   "userPage": {
+    "username": "Username",
+    "password": "Password",
+    "role": "Role",
+    "userProfile": "User profile",
     "title": "Manage users",
     "userId": "User ID",
     "name": "Name",
@@ -80,6 +84,22 @@
       "userIdCantBeEmpty": "User ID can't be empty",
       "bookIdCantBeEmpty": "Book ID can't be empty",
       "dueDateCantBeEmpty": "Due date can't be empty"
+    },
+    "snackbar": {
+      "loanCreatedSuccessfully": "Loan created successfully",
+      "loanCreationFailed": "Loan creation failed",
+      "loanDeletedSuccessfully": "Loan deleted successfully",
+      "loanDeletionFailed": "Loan deletion failed",
+      "loanReturnedSuccessfully": "Book returned successfully",
+      "loanReturnFailed": "Book return failed",
+      "userCreatedSuccessfully": "User created successfully",
+      "userCreationFailed": "User creation failed",
+      "userDeletedSuccessfully": "User deleted successfully",
+      "userDeletionFailed": "User deletion failed",
+      "bookCreatedSuccessfully": "Book created successfully",
+      "bookCreationFailed": "Book creation failed",
+      "bookDeletedSuccessfully": "Book deleted successfully",
+      "bookDeletionFailed": "Book deletion failed"
     }
   },
   "errors": {
