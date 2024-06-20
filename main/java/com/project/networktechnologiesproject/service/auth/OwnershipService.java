@@ -10,6 +10,10 @@ public abstract class OwnershipService {
         this.authRepository = authRepository;
     }
 
+    public void deleteByUser_Id(Long userId){
+        authRepository.deleteByUser_Id(userId);
+    }
+
     public boolean isOwner(String username, Long userId){
         if(userId == null || username == null){
             return false;

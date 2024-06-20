@@ -8,4 +8,5 @@ import java.util.Optional;
 @Repository
 public interface AuthRepository extends JpaRepository<AuthEntity, Long> {
     Optional<AuthEntity> findByUsername(String username);
+    void deleteByUser_Id(Long userId);
 }

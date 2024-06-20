@@ -11,6 +11,7 @@ import com.project.networktechnologiesproject.service.user.error.UserWithUsernam
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,10 +47,12 @@ public class UserService extends OwnershipService {
 
     }
 
+    @Transactional
     public void delete(long id){
         if (!userRepository.existsById(id)){
             throw UserWithIdNotFoundException.create(id);
         }
+        authRepository.deleteByUser_Id(id);
         userRepository.deleteById(id);
     }
 
