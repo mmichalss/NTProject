@@ -16,10 +16,10 @@ import LoanAdminPage from './users_page/loan-page-admin/LoanAdminPage';
 import LoanHistoryPage from './loan-page/loan-history-page/LoanHistoryPage';
 import UserProfilePage from './profile-page/UserProfilePage';
 import AccessDeniedPage from './errors_and_snackbars/AccessDeniedPage';
+import useGetRole from './useGetRole';
 
 function App() {
-  const apiClient = useApi();
-  const role = apiClient.getUserRole();
+  const { role, fetchRole } = useGetRole();
   const readerAndAdmin = role === 'ROLE_READER' || role === 'ROLE_ADMIN';
   const adminOnly = role === 'ROLE_ADMIN';
   return (
