@@ -67,7 +67,6 @@ public class UserService extends OwnershipService {
     public PatchUserResponseDto update(long id, PatchUserDto dto){
         UserEntity user = userRepository.findById(id).orElseThrow();
 
-        // dto.getEmail() can be null, present and not present (undefined).
         dto.getEmail().ifPresent(user::setEmail);
         dto.getName().ifPresent(user::setName);
         dto.getLastName().ifPresent(user::setLastName);
