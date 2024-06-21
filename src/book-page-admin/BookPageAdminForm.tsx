@@ -6,7 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
-import useBooks from './Book-page-admin-data';
+import useBooks from './BookPageAdminData';
 import DeleteBook from './DeleteBook';
 import { useTranslation } from 'react-i18next';
 import CreateBook from './CreateBook';

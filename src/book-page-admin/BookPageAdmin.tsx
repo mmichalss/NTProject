@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import BookFormAdmin from './Book-page-admin-form';
+import BookFormAdmin from './BookPageAdminForm';
 import CreateBook from './CreateBook';
 
 export default function BookPageAdmin() {

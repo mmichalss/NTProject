@@ -1,4 +1,4 @@
-import useUsersData from './users_data';
+import useUsersData from './usersData';
 import { GetUserDto } from '../api/dto/user/user.dto';
 import * as React from 'react';
 import Table from '@mui/material/Table';
@@ -10,10 +10,10 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import { Button, Link } from '@mui/material';
 import UpdateUser from './updateUser';
-import AddNewUser from './addNewUser';
 import { useTranslation } from 'react-i18next';
 import MySnackbar from '../errors_and_snackbars/Snackbar';
 import DeleteUser from './DeleteUser';
+import AddNewUser from './AddNewUser';
 
 export default function UsersForm() {
   const { users, fetchUsers } = useUsersData();

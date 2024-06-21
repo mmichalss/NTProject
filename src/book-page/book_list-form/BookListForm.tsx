@@ -1,5 +1,5 @@
-import './Book_list-form.css';
-import useBooks from './Book_data';
+import './BookListForm.css';
+import useBooks from './BookData';
 import * as React from 'react';
 import { alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -23,13 +23,11 @@ import Switch from '@mui/material/Switch';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { useApi } from '../../api/ApiProvider';
-import CreateLoan from './Create_loan';
+import CreateLoan from './CreateLoan';
 import useGetMe from '../../users_page/getMe';
 import { useTranslation } from 'react-i18next';
 import { TFunction } from 'i18next';
-import { enqueueSnackbar } from 'notistack';
 import ErrorPage from '../../errors_and_snackbars/ErrorPage';
-import MySnackbar from '../../errors_and_snackbars/Snackbar';
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
