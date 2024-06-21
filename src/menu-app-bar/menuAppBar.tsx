@@ -14,6 +14,7 @@ import { Link } from 'react-router-dom';
 import { useApi } from '../api/ApiProvider';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
+import './menuAppBar.css';
 
 function MenuAppBar() {
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
@@ -85,7 +86,7 @@ function MenuAppBar() {
   }
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" className="menuAppBar">
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Typography

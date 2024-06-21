@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
-import { useApi } from './../api/ApiProvider';
-import { GetBookDto, GetBookMappedDto } from './../api/dto/book/book.dto';
-import { ClientResponse } from './../api/library-client';
+import { useApi } from '../api/ApiProvider';
+import { GetBookDto, GetBookMappedDto } from '../api/dto/book/book.dto';
+import { ClientResponse } from '../api/library-client';
 import React from 'react';
 
 export default function useBooks() {

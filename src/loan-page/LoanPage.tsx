@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import LoanList from './Loan_list-from';
+import LoanList from './LoanListFrom';
 
 function LoanPage() {
   const { t } = useTranslation();

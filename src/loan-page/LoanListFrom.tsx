@@ -4,7 +4,7 @@ import { alpha } from '@mui/material/styles';
 import { visuallyHidden } from '@mui/utils';
 import { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
-import useLoans from '../loan-page/Loan_data';
+import useLoans from './LoanData';
 import { GetLoanDto, GetLoanPagesDto } from '../api/dto/loan/loan.dto';
 import {
   Box,
